@@ -1,3 +1,4 @@
 (library
  (name twitter)
- (public_name Twitter))
+ (public_name Twitter)
+ (libraries unix))

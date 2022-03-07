@@ -2,3 +2,4 @@
 
 type t
 
+val create_post : string -> t

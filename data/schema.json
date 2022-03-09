@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "tweet": {
+      "type": "string"
+    },
+    "hashtags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "time": {
+      "type": "string"
+    },
+    "id": {
+      "type": "int"
+    }
+  }
+}

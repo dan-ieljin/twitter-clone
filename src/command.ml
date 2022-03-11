@@ -20,4 +20,5 @@ let parse str =
   | [ "search" ] -> Search
   | [ "viewprofile" ] -> ViewProfile
   | [ "deletemypost" ] -> DeleteMyPost
+  | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid

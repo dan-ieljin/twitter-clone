@@ -1,3 +1,3 @@
-(** Representation of user data*)
+(** Representation of user data. *)
 
 type t

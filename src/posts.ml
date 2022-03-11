@@ -1,9 +1,13 @@
+open Yojson.Basic.Util
+
 type t = {
   text : string;
   hashtags : string list;
   timestamp : string;
   id : int;
 }
+
+exception Invalid of string
 
 let get_date (tm : Unix.tm) =
   let month = string_of_int tm.tm_mon in
@@ -22,14 +26,17 @@ let get_time (tm : Unix.tm) =
 
 let date_and_time tm = get_time tm ^ " " ^ get_date tm
 
-exception Invalid
-
-let create_post s =
-  if String.length s <= 280 then
+let create_post s lst id_val =
+  let l = s |> String.trim |> String.length in
+  if l > 280 then raise (Invalid "Too long")
+  else if l <= 0 then raise (Invalid "Too short")
+  else
     {
       text = s;
-      hashtags = [];
+      hashtags = lst;
       timestamp = date_and_time (Unix.localtime (Unix.time ()));
-      id = 0;
+      id = id_val;
     }
-  else raise Invalid
+
+let from_json json = failwith "Not implemented"
+let to_json p = failwith "Not implemented"

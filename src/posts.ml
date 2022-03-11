@@ -38,5 +38,5 @@ let create_post s lst id_val =
       id = id_val;
     }
 
-let from_json json = failwith "Not implemented"
-let to_json p = failwith "Not implemented"
+let from_json = failwith "Not implemented"
+let to_json = failwith "Not implemented"

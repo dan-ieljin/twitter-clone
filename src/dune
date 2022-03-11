@@ -1,4 +1,4 @@
 (library
  (name twitter)
  (public_name Twitter)
- (libraries unix))
+ (libraries yojson unix))

@@ -14,7 +14,7 @@ val date_and_time : Unix.tm -> string
 (**[date_and_time] gets a user's local date and time then converts it
    into string format. *)
 
-val create_post : string -> string list -> t
+val create_post : string -> string list -> int -> t
 (**[create_post s lst] creates a record of type post with [s] as its
    textual content, [lst] as its hashtags, and [id_val] as its id.
    Raises: [Invalid p] if the length of [s] > 280 or [s] is the empty

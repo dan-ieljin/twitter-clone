@@ -1,11 +1,8 @@
 (** Parsing of user input into commands. *)
 
 type command =
-  | Post
-  | HomePage
-  | Search
-  | ViewProfile
-  | F
+  | Post of string
+  | Quit  (** | HomePage | Search | ViewProfile | F *)
 
 exception Empty
 exception Invalid

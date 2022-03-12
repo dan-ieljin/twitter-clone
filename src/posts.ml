@@ -38,5 +38,17 @@ let create_post s lst id_val =
       id = id_val;
     }
 
-let from_json = failwith "Not implemented"
+(**[parse_file j] helps parse the post text, hashtags, and timestamp.*)
+let parse_file j =
+  {
+    text = j |> member "tweet" |> to_string;
+    hashtags = j |> member "hashtags" |> to_list |> List.map to_string;
+    timestamp = date_and_time (Unix.localtime (Unix.time ()));
+    id = j |> member "id" |> to_int;
+  }
+
+let from_json json =
+  try parse_file json
+  with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
+
 let to_json = failwith "Not implemented"

@@ -10,11 +10,13 @@
         "type": "string"
       }
     },
-    "time": {
-      "type": "string"
-    },
     "id": {
       "type": "int"
     }
-  }
+  },
+  "required": [
+    "tweet",
+    "hashtags",
+    "id"
+  ]
 }

@@ -51,8 +51,6 @@ let from_json json =
   try parse_file json
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
-let file = "data/posts.json"
-
 let json_output post : Yojson.Basic.t =
   `Assoc
     [
@@ -61,9 +59,5 @@ let json_output post : Yojson.Basic.t =
       ("id", `Int post.id);
     ]
 
-let to_json text =
-  let oc = stdout in
-  Yojson.Basic.pretty_to_channel oc text;
-  output_string oc "\n"
-
-(* let oc = open_out file in print_string post.text; close_out oc *)
+let to_json text = Yojson.Basic.to_file "data/posts.json" text
+(* let oc = open_out file in "print_string" post.text; close_out oc *)

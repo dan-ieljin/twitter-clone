@@ -28,5 +28,5 @@ val json_output : t -> Yojson.Basic.t
 (** [json_output post] converts the data in a [post] to a JSON post
     representation.*)
 
-val to_json : t -> Yojson.Basic.t
+val to_json : Yojson.Basic.t -> unit
 (** [to_json p] converts a JSON post representation into JSON file.*)

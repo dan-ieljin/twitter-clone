@@ -1,7 +1,8 @@
 type command =
   | Post of string
+  | HomePage
   | Quit
-(* | HomePage | Search | ViewProfile | DeleteMyPost*)
+(* | Search | ViewProfile | DeleteMyPost*)
 
 exception Empty
 exception Invalid
@@ -14,9 +15,9 @@ let parse str =
   let txt_lst = String.split_on_char ' ' text in
   match remove_whitespace txt_lst with
   | "post" :: t -> Post (String.concat " " t)
-  (* | [ "homepage" ] -> HomePage | [ "search" ] -> Search | [
-     "viewprofile" ] -> ViewProfile | [ "deletemypost" ] ->
-     DeleteMyPost *)
+  | [ "homepage" ] -> HomePage
+  (* | [ "search" ] -> Search | [ "viewprofile" ] -> ViewProfile | [
+     "deletemypost" ] -> DeleteMyPost *)
   | [ "quit" ] -> Quit
   | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid

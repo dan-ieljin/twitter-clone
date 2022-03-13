@@ -2,7 +2,8 @@
 
 type command =
   | Post of string
-  | Quit  (** | HomePage | Search | ViewProfile | F *)
+  | HomePage
+  | Quit  (** | Search | ViewProfile | F *)
 
 exception Empty
 exception Invalid

@@ -37,6 +37,8 @@ let tm_2 : Unix.tm =
     tm_isdst = false;
   }
 
+let post1 = create_post "hello" [] 0
+
 let post_tests =
   [
     date_and_time_test "Date and time 1" tm_1 "11:11 AM 11/11/2011";

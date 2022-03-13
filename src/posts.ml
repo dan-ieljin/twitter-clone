@@ -51,4 +51,14 @@ let from_json json =
   try parse_file json
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
-let to_json = failwith "Not implemented"
+let file = "data/posts.json"
+
+let to_json post : Yojson.Basic.t =
+  `Assoc
+    [
+      ("text", `String post.text);
+      ("time", `String post.timestamp);
+      ("id", `Int post.id);
+    ]
+
+(* let oc = open_out file in print_string post.text; close_out oc *)

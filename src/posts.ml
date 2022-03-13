@@ -53,12 +53,17 @@ let from_json json =
 
 let file = "data/posts.json"
 
-let to_json post : Yojson.Basic.t =
+let json_output post : Yojson.Basic.t =
   `Assoc
     [
       ("text", `String post.text);
       ("time", `String post.timestamp);
       ("id", `Int post.id);
     ]
+
+let to_json text =
+  let oc = stdout in
+  Yojson.Basic.pretty_to_channel oc text;
+  output_string oc "\n"
 
 (* let oc = open_out file in print_string post.text; close_out oc *)

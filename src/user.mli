@@ -1,4 +1,4 @@
-(** Representation of user data. *)
+(** Representation of user data. Handles creating new users. *)
 
 type t
 

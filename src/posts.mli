@@ -1,4 +1,4 @@
-(** Representation of post data.contents
+(** Representation of post contents.
 
     This module represents the data stored in a user's post, including
     the contents of the post, date, time. It also handles loading that
@@ -24,5 +24,9 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
+val json_output : t -> Yojson.Basic.t
+(** [json_output post] converts the data in a [post] to a JSON post
+    representation.*)
+
 val to_json : t -> Yojson.Basic.t
-(** [to_json p] converts a post into JSON post representation.*)
+(** [to_json p] converts a JSON post representation into JSON file.*)

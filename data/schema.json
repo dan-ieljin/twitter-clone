@@ -1,22 +1,31 @@
 {
   "type": "object",
   "properties": {
-    "tweet": {
-      "type": "string"
-    },
-    "hashtags": {
+    "posts": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "tweet": {
+            "type": "string"
+          },
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          }
+        }
       }
-    },
-    "id": {
-      "type": "int"
     }
   },
   "required": [
-    "tweet",
-    "hashtags",
-    "id"
+    "posts"
   ]
 }

@@ -4,8 +4,11 @@
     the contents of the post, date, time. It also handles loading that
     data from JSON and the functions to add and delete posts. *)
 
-type t
+type post
 (**The abstract type of values representing posts. *)
+
+type t
+(**The abstract list of values representing a list of posts*)
 
 exception Invalid of string
 (**Raised when an input into a post is invalid. *)
@@ -14,7 +17,7 @@ val date_and_time : Unix.tm -> string
 (**[date_and_time] gets a user's local date and time then converts it
    into string format. *)
 
-val create_post : string -> string list -> int -> t
+val create_post : string -> string list -> int -> post
 (**[create_post s lst] creates a record of type post with [s] as its
    textual content, [lst] as its hashtags, and [id_val] as its id.
    Raises: [Invalid p] if the length of [s] > 280 or [s] is the empty

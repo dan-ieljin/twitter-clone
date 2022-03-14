@@ -59,9 +59,13 @@ let from_json json =
 let json_output post : Yojson.Basic.t =
   `Assoc
     [
-      ("text", `String post.text);
-      ("time", `String post.timestamp);
-      ("id", `Int post.id);
+      ( "posts",
+        `Assoc
+          [
+            ("text", `String post.text);
+            ("time", `String post.timestamp);
+            ("id", `Int post.id);
+          ] );
     ]
 
 let file = "data/posts.json"

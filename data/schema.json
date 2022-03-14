@@ -21,7 +21,12 @@
           "id": {
             "type": "integer"
           }
-        }
+        },
+        "required": [
+          "tweet",
+          "hashtags",
+          "id"
+        ]
       }
     }
   },

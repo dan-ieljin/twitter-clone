@@ -8,7 +8,7 @@ type post = {
   username : string;
 }
 
-type t = { posts : post list }
+type t = post list
 
 exception Invalid of string
 
@@ -47,30 +47,37 @@ let parse_record j =
   {
     text = j |> member "tweet" |> to_string;
     hashtags = j |> member "hashtags" |> to_list |> List.map to_string;
-    timestamp = date_and_time (Unix.localtime (Unix.time ()));
+    timestamp = j |> member "timestamp" |> to_string;
     id = j |> member "id" |> to_int;
     username = j |> member "username" |> to_string;
   }
 
 (**[parse_list j] helps from_json parse post list.*)
 let parse_list j =
-  { posts = j |> member "posts" |> to_list |> List.map parse_record }
+  j |> member "posts" |> to_list |> List.map parse_record
 
-let from_json json =
+let from_json json : t =
   try parse_list json
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
+
+let add_post s lst id : t =
+  let post_list =
+    Yojson.Basic.from_file "data/posts.json" |> from_json
+  in
+  create_post s lst id :: post_list
 
 let json_post p : Yojson.Basic.t =
   `Assoc
     [
-      ("text", `String p.text);
-      ("time", `String p.timestamp);
+      ("tweet", `String p.text);
+      ("hashtags", `List []);
+      ("timestamp", `String p.timestamp);
       ("id", `Int p.id);
       ("username", `String p.username);
     ]
 
-let json_output post_list : Yojson.Basic.t =
-  `Assoc [ ("post", `List (List.map json_post post_list)) ]
+let json_output (post_list : t) : Yojson.Basic.t =
+  `Assoc [ ("posts", `List (List.map json_post post_list)) ]
 
 (**File containing the JSON represenation of post list.*)
 let file = "data/posts.json"
@@ -79,5 +86,3 @@ let to_json post =
   let oc = open_out file in
   Yojson.Basic.to_channel oc post;
   close_out oc
-
-(* Yojson.Basic.to_file "data/posts.json" text *)

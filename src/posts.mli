@@ -27,11 +27,13 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
+val add_post : string -> string list -> int -> t
+
 val json_post : post -> Yojson.Basic.t
 (** [json_post p] converts a the data of a post [p] displayed in a
     record into a Yojson type association list. *)
 
-val json_output : post list -> Yojson.Basic.t
+val json_output : t -> Yojson.Basic.t
 (** [json_output post] converts the data in a list containing [post] to
     a JSON post list representation.*)
 

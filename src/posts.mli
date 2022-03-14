@@ -27,7 +27,7 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
-val json_output : t -> Yojson.Basic.t
+val json_output : post -> Yojson.Basic.t
 (** [json_output post] converts the data in a [post] to a JSON post
     representation.*)
 

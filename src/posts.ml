@@ -5,6 +5,7 @@ type post = {
   hashtags : string list;
   timestamp : string;
   id : int;
+  username : string;
 }
 
 type t = { posts : post list }
@@ -38,6 +39,7 @@ let create_post s lst id_val =
       hashtags = lst;
       timestamp = date_and_time (Unix.localtime (Unix.time ()));
       id = id_val;
+      username = "blank";
     }
 
 (**[parse_record j] helps parse the post text, hashtags, and timestamp.*)
@@ -47,8 +49,10 @@ let parse_record j =
     hashtags = j |> member "hashtags" |> to_list |> List.map to_string;
     timestamp = date_and_time (Unix.localtime (Unix.time ()));
     id = j |> member "id" |> to_int;
+    username = j |> member "username" |> to_string;
   }
 
+(**[parse_list j] helps from_json parse post list.*)
 let parse_list j =
   { posts = j |> member "posts" |> to_list |> List.map parse_record }
 
@@ -56,18 +60,19 @@ let from_json json =
   try parse_list json
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
-let json_output post : Yojson.Basic.t =
+let json_post p : Yojson.Basic.t =
   `Assoc
     [
-      ( "posts",
-        `Assoc
-          [
-            ("text", `String post.text);
-            ("time", `String post.timestamp);
-            ("id", `Int post.id);
-          ] );
+      ("text", `String p.text);
+      ("time", `String p.timestamp);
+      ("id", `Int p.id);
+      ("username", `String p.username);
     ]
 
+let json_output post_list : Yojson.Basic.t =
+  `Assoc [ ("post", `List (List.map json_post post_list)) ]
+
+(**File containing the JSON represenation of post list.*)
 let file = "data/posts.json"
 
 let to_json post =

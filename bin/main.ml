@@ -6,7 +6,7 @@ let print_blue s =
   ANSITerminal.print_string [ ANSITerminal.cyan ] (s ^ "\n")
 
 let rec post s =
-  create_post s [] 0 |> json_output |> to_json;
+  create_post s [] 0 |> json_post |> to_json;
   print_blue "\nWhat would you like to do?\n";
   try parse (read_line ()) |> get_command
   with Invalid | Empty ->

@@ -20,12 +20,16 @@
           },
           "id": {
             "type": "integer"
+          },
+          "username": {
+            "type": "string"
           }
         },
         "required": [
           "tweet",
           "hashtags",
-          "id"
+          "id",
+          "username"
         ]
       }
     }

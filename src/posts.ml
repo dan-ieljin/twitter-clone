@@ -1,11 +1,13 @@
 open Yojson.Basic.Util
 
-type t = {
+type post = {
   text : string;
   hashtags : string list;
   timestamp : string;
   id : int;
 }
+
+type t = { posts : post list }
 
 exception Invalid of string
 
@@ -38,8 +40,8 @@ let create_post s lst id_val =
       id = id_val;
     }
 
-(**[parse_file j] helps parse the post text, hashtags, and timestamp.*)
-let parse_file j =
+(**[parse_record j] helps parse the post text, hashtags, and timestamp.*)
+let parse_record j =
   {
     text = j |> member "tweet" |> to_string;
     hashtags = j |> member "hashtags" |> to_list |> List.map to_string;
@@ -47,8 +49,11 @@ let parse_file j =
     id = j |> member "id" |> to_int;
   }
 
+let parse_list j =
+  { posts = j |> member "posts" |> to_list |> List.map parse_record }
+
 let from_json json =
-  try parse_file json
+  try parse_list json
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
 let json_output post : Yojson.Basic.t =

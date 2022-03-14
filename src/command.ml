@@ -16,8 +16,8 @@ let parse str =
   match remove_whitespace txt_lst with
   | "post" :: t -> Post (String.concat " " t)
   | [ "homepage" ] -> HomePage
-  (* | [ "search" ] -> Search | [ "viewprofile" ] -> ViewProfile | [
-     "deletemypost" ] -> DeleteMyPost *)
   | [ "quit" ] -> Quit
   | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid
+(* | [ "search" ] -> Search | [ "viewprofile" ] -> ViewProfile | [
+   "deletemypost" ] -> DeleteMyPost *)

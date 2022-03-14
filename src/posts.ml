@@ -14,7 +14,7 @@ exception Invalid of string
 let get_date (tm : Unix.tm) =
   let month = string_of_int tm.tm_mon in
   let day = string_of_int tm.tm_mday in
-  let year = string_of_int tm.tm_year in
+  let year = string_of_int (1900 + tm.tm_year) in
   month ^ "/" ^ day ^ "/" ^ year
 
 let get_time (tm : Unix.tm) =

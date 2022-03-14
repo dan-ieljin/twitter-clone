@@ -1,6 +1,5 @@
 open Twitter
-
-(* open Posts *)
+open Posts
 open Command
 
 let print_blue s =
@@ -11,7 +10,7 @@ let print_blue s =
    failwith "not implemented" | Quit -> print_blue "See you next
    time!\n"; exit 0 with Failure _ -> print_blue "Invalid command"; *)
 
-let post s = failwith s
+let post s = create_post s [] 0 |> json_output |> to_json
 
 let main () =
   print_blue "\nWelcome to Twitter.\n";

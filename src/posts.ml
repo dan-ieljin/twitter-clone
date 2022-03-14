@@ -59,5 +59,11 @@ let json_output post : Yojson.Basic.t =
       ("id", `Int post.id);
     ]
 
-let to_json text = Yojson.Basic.to_file "data/posts.json" text
-(* let oc = open_out file in "print_string" post.text; close_out oc *)
+let file = "data/posts.json"
+
+let to_json post =
+  let oc = open_out file in
+  Yojson.Basic.to_channel oc post;
+  close_out oc
+
+(* Yojson.Basic.to_file "data/posts.json" text *)

@@ -23,6 +23,9 @@ val create_post : string -> string list -> int -> post
    Raises: [Invalid p] if the length of [s] > 280 or [s] is the empty
    string. Also raises [Invalid p] if [s] contains only white space. *)
 
+val get_tweet : post -> string * string list * string * int * string
+(**[get_tweet p]* returns a post in tuple format. *)
+
 val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)

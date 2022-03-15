@@ -29,6 +29,9 @@ let get_time (tm : Unix.tm) =
 
 let date_and_time tm = get_time tm ^ " " ^ get_date tm
 
+let get_tweet post =
+  (post.text, post.hashtags, post.timestamp, post.id, post.username)
+
 let create_post s lst id_val =
   let l = s |> String.trim |> String.length in
   if l > 280 then raise (Invalid "Too long")

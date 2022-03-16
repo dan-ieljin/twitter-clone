@@ -23,7 +23,10 @@ let get_time (tm : Unix.tm) =
     if tm.tm_hour > 12 then string_of_int (tm.tm_hour mod 12)
     else string_of_int tm.tm_hour
   in
-  let minute = string_of_int tm.tm_min in
+  let minute =
+    if tm.tm_min < 10 then "0" ^ string_of_int tm.tm_min
+    else string_of_int tm.tm_min
+  in
   let ending = if tm.tm_hour < 12 then "AM" else "PM" in
   hour ^ ":" ^ minute ^ " " ^ ending
 

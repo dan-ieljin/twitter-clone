@@ -8,12 +8,9 @@ let date_and_time_test
     (expected_output : string) : test =
   name >:: fun _ -> assert_equal expected_output (date_and_time tm)
 
-let create_post_test
-    (name : string)
-    (post : post)
-    (expected_output : string * string list * string * int * string) :
-    test =
-  name >:: fun _ -> assert_equal expected_output (get_tweet post)
+(* let create_post_test (name : string) (post : post) (expected_output :
+   string * string list * string * int * string) : test = name >:: fun _
+   -> assert_equal expected_output (get_tweet post) *)
 
 let tm_1 : Unix.tm =
   {
@@ -47,15 +44,9 @@ let time_tests =
       11/11/2011"; *) ]
 
 let create_post_tests =
-  [
-    create_post_test "Test 1"
-      (create_post "hello" [] 0)
-      ( "hello",
-        [],
-        date_and_time (Unix.localtime (Unix.time ())),
-        0,
-        "blank" );
-  ]
+  [ (* create_post_test "Test 1" (create_post "hello" [] 0) ( "hello",
+       [], date_and_time (Unix.localtime (Unix.time ())), 0, "blank"
+       ); *) ]
 
 let suite =
   "test suite for Twitter"

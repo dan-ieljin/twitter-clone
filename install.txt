@@ -1,0 +1,16 @@
+For information on installing and configuring OCaml, refer to the CS3110 course 
+textbook: https://cs3110.github.io/textbook/chapters/preface/install.html
+
+Run the following command to install the required packages:  
+
+$ opam install ANSITerminal
+$ opam install yojson
+
+
+Run the following command to build the system: 
+
+$ make build
+
+To start the program run: 
+
+$ make play

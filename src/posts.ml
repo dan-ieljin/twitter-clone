@@ -10,7 +10,7 @@ type post = {
 
 type t = post list
 
-exception Invalid of string
+exception InvalidPost of string
 
 let get_date (tm : Unix.tm) =
   let month = string_of_int tm.tm_mon in
@@ -35,19 +35,6 @@ let date_and_time tm = get_time tm ^ " " ^ get_date tm
 let get_tweet post =
   (post.text, post.hashtags, post.timestamp, post.id, post.username)
 
-let create_post s lst id_val =
-  let l = s |> String.trim |> String.length in
-  if l > 280 then raise (Invalid "Too long")
-  else if l <= 0 then raise (Invalid "Too short")
-  else
-    {
-      text = s;
-      hashtags = lst;
-      timestamp = date_and_time (Unix.localtime (Unix.time ()));
-      id = id_val;
-      username = "blank";
-    }
-
 (**[parse_record j] helps parse the post text, hashtags, and timestamp.*)
 let parse_record j =
   {
@@ -58,37 +45,58 @@ let parse_record j =
     username = j |> member "username" |> to_string;
   }
 
-(**[parse_list j] helps from_json parse post list.*)
-let parse_list j =
-  j |> member "posts" |> to_list |> List.map parse_record
-
 let from_json json : t =
-  try parse_list json
+  try json |> member "posts" |> to_list |> List.map parse_record
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
-let add_post s lst id : t =
+let hashtags s =
+  let text_list =
+    s |> String.lowercase_ascii |> String.split_on_char ' '
+  in
+  List.filter (fun x -> x.[0] = '#') text_list
+
+let create_post s id_val =
+  {
+    text = s;
+    hashtags =
+      (if List.length (hashtags s) <= 5 then hashtags s
+      else raise (InvalidPost "hashtag"));
+    timestamp = date_and_time (Unix.localtime (Unix.time ()));
+    id = id_val;
+    username = "blank";
+  }
+
+let add_post s id : t =
+  let length = s |> String.trim |> String.length in
+  if length > 280 then raise (InvalidPost "Too long")
+  else if length <= 0 then raise (InvalidPost "Too short");
+
   let post_list =
     Yojson.Basic.from_file "data/posts.json" |> from_json
   in
-  create_post s lst id :: post_list
+  try create_post s id :: post_list
+  with InvalidPost "hashtag" -> raise (InvalidPost "hashtag")
 
-let json_post p : Yojson.Basic.t =
+(** [to_yojson p] converts a the data of a post [p] displayed in a
+    record into a Yojson type association list. *)
+let to_yojson p : Yojson.Basic.t =
   `Assoc
     [
       ("tweet", `String p.text);
-      ("hashtags", `List []);
+      ("hashtags", `List (List.map (fun x -> `String x) p.hashtags));
       ("timestamp", `String p.timestamp);
       ("id", `Int p.id);
       ("username", `String p.username);
     ]
 
-let json_output (post_list : t) : Yojson.Basic.t =
-  `Assoc [ ("posts", `List (List.map json_post post_list)) ]
-
-(**File containing the JSON represenation of post list.*)
+(** File containing the JSON represenation of post list. *)
 let file = "data/posts.json"
 
-let to_json post =
+let to_json post_list =
+  let json_output (post_list : t) : Yojson.Basic.t =
+    `Assoc [ ("posts", `List (List.map to_yojson post_list)) ]
+  in
+  let yojson_post = json_output post_list in
   let oc = open_out file in
-  Yojson.Basic.to_channel oc post;
+  Yojson.Basic.to_channel oc yojson_post;
   close_out oc

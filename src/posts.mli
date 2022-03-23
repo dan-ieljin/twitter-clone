@@ -10,14 +10,17 @@ type post
 type t
 (**The abstract list of values representing a list of posts*)
 
-exception Invalid of string
+exception InvalidPost of string
 (**Raised when an input into a post is invalid. *)
 
 val date_and_time : Unix.tm -> string
 (**[date_and_time] gets a user's local date and time then converts it
    into string format. *)
 
-val create_post : string -> string list -> int -> post
+val hashtags : string -> string list
+(** [hashtags s] is the list of hashtags in string s *)
+
+val create_post : string -> int -> post
 (**[create_post s lst] creates a record of type post with [s] as its
    textual content, [lst] as its hashtags, and [id_val] as its id.
    Raises: [Invalid p] if the length of [s] > 280 or [s] is the empty
@@ -30,15 +33,7 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
-val add_post : string -> string list -> int -> t
+val add_post : string -> int -> t
 
-val json_post : post -> Yojson.Basic.t
-(** [json_post p] converts a the data of a post [p] displayed in a
-    record into a Yojson type association list. *)
-
-val json_output : t -> Yojson.Basic.t
-(** [json_output post] converts the data in a list containing [post] to
-    a JSON post list representation.*)
-
-val to_json : Yojson.Basic.t -> unit
-(** [to_json p] converts a JSON post representation into JSON file.*)
+val to_json : t -> unit
+(** [to_json p] converts posts [t] into JSON file.*)

@@ -2,11 +2,37 @@ open OUnit2
 open Twitter
 open Posts
 
+(** [pp_string s] pretty-prints string [s]. *)
+let pp_string s = "\"" ^ s ^ "\""
+
+(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
+    pretty-print each element of [lst]. *)
+let pp_list pp_elt lst =
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (_ :: _ as t') ->
+          if n = 100 then acc ^ "..."
+          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
+    in
+    loop 0 "" lst
+  in
+  "[" ^ pp_elts lst ^ "]"
+
 let date_and_time_test
     (name : string)
     (tm : Unix.tm)
     (expected_output : string) : test =
   name >:: fun _ -> assert_equal expected_output (date_and_time tm)
+
+let hashtags_test
+    (name : string)
+    (text : string)
+    (expected_output : string list) : test =
+  name >:: fun _ ->
+  assert_equal ~printer:(pp_list pp_string) expected_output
+    (hashtags text)
 
 (* let create_post_test (name : string) (post : post) (expected_output :
    string * string list * string * int * string) : test = name >:: fun _
@@ -48,8 +74,14 @@ let create_post_tests =
        [], date_and_time (Unix.localtime (Unix.time ())), 0, "blank"
        ); *) ]
 
-let suite =
-  "test suite for Twitter"
-  >::: List.flatten [ time_tests; create_post_tests ]
+let posts_tests =
+  [
+    hashtags_test "One hashtag: #twitter" "Hello world #twitter"
+      [ "#twitter" ];
+    hashtags_test "One hashtag: #hello" "hi #hello" [ "#hello" ];
+    hashtags_test "Two hashtags" "#CS3110 Hello world #hashtag"
+      [ "#cs3110"; "#hashtag" ];
+  ]
 
+let suite = "test suite for Twitter" >::: List.flatten [ posts_tests ]
 let _ = run_test_tt_main suite

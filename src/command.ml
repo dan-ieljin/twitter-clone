@@ -1,5 +1,5 @@
 type command =
-  | Post of string
+  | Post
   | HomePage
   | Quit
 (* | Search | ViewProfile | DeleteMyPost*)
@@ -14,7 +14,7 @@ let parse str =
   let text = String.lowercase_ascii str in
   let txt_lst = String.split_on_char ' ' text in
   match remove_whitespace txt_lst with
-  | "post" :: t -> Post (String.concat " " t)
+  | [ "post" ] -> Post
   | [ "homepage" ] -> HomePage
   | [ "quit" ] -> Quit
   | [] | [ "" ] | "" :: _ -> raise Empty

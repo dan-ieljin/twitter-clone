@@ -1,7 +1,7 @@
 (** Parsing of user input into commands. *)
 
 type command =
-  | Post of string
+  | Post
   | HomePage
   | Quit  (** | Search | ViewProfile | F *)
 

@@ -8,25 +8,25 @@ let print_blue s =
 let print_red s =
   ANSITerminal.print_string [ ANSITerminal.red ] (s ^ "\n")
 
-let rec post () =
+let rec post info =
   let p = read_line () in
   try
-    add_post p 0 |> to_json;
+    add_post p (get_id info) |> to_json (get_id info);
     print_blue "\nPost successful!\n";
     get_command ()
   with
   | InvalidPost "Too long" ->
       print_red "\nYour post exceeds the character limit.\n";
       print_blue "Please enter a new post:\n";
-      post ()
+      post info
   | InvalidPost "Too short" ->
       print_red "\nYour post contains no characters.\n";
       print_blue "Please enter a new post:\n";
-      post ()
+      post info
   | InvalidPost "hashtag" ->
       print_red "\nYour post contains too many hashtags.\n";
       print_blue "Please enter a new post:\n";
-      post ()
+      post info
 
 and get_command () =
   let posts = Yojson.Basic.from_file "data/posts.json" in
@@ -36,7 +36,7 @@ and get_command () =
     match parse (read_line ()) with
     | Post ->
         print_blue "\nEnter a post:\n";
-        post ()
+        posts |> from_json |> post
     | HomePage ->
         print_blue "\nMain Feed:\n";
         Yojson.Basic.pretty_print Format.std_formatter posts;

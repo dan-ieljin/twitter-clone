@@ -33,7 +33,13 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
-val add_post : string -> int -> t
+val add_post : string -> int -> post list
 
-val to_json : t -> unit
+val to_json : int -> post list -> unit
 (** [to_json p] converts posts [t] into JSON file.*)
+
+val get_tweets : t -> post list
+(** [get_posts p] returns all the posts in a list of all posts [p].*)
+
+val get_id : t -> int
+(** [get_id p] returns the id number in a list of posts [p].*)

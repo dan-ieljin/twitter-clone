@@ -8,7 +8,10 @@ type post = {
   username : string;
 }
 
-type t = post list
+type t = {
+  posts : post list;
+  id_number : int;
+}
 
 exception InvalidPost of string
 
@@ -45,8 +48,14 @@ let parse_record j =
     username = j |> member "username" |> to_string;
   }
 
+let parse_file j =
+  {
+    posts = j |> member "posts" |> to_list |> List.map parse_record;
+    id_number = j |> member "number" |> to_int;
+  }
+
 let from_json json : t =
-  try json |> member "posts" |> to_list |> List.map parse_record
+  try parse_file json
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
 let hashtags s =
@@ -66,13 +75,17 @@ let create_post s id_val =
     username = "blank";
   }
 
-let add_post s id : t =
+let get_tweets p = p.posts
+let get_id p = p.id_number
+let increment p = { p with id_number = p.id_number + 1 }
+
+let add_post s id =
   let length = s |> String.trim |> String.length in
   if length > 280 then raise (InvalidPost "Too long")
   else if length <= 0 then raise (InvalidPost "Too short");
 
   let post_list =
-    Yojson.Basic.from_file "data/posts.json" |> from_json
+    Yojson.Basic.from_file "data/posts.json" |> from_json |> get_tweets
   in
   try create_post s id :: post_list
   with InvalidPost "hashtag" -> raise (InvalidPost "hashtag")
@@ -92,9 +105,13 @@ let to_yojson p : Yojson.Basic.t =
 (** File containing the JSON represenation of post list. *)
 let file = "data/posts.json"
 
-let to_json post_list =
-  let json_output (post_list : t) : Yojson.Basic.t =
-    `Assoc [ ("posts", `List (List.map to_yojson post_list)) ]
+let to_json id_num post_list =
+  let json_output post_list : Yojson.Basic.t =
+    `Assoc
+      [
+        ("posts", `List (List.map to_yojson post_list));
+        ("number", `Int id_num);
+      ]
   in
   let yojson_post = json_output post_list in
   let oc = open_out file in

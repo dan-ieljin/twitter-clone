@@ -11,7 +11,7 @@ let print_red s =
 let rec post info =
   let p = read_line () in
   try
-    add_post p (get_id info) |> to_json (get_id info);
+    add_post p (get_id info) |> to_json (get_id (increment info));
     print_blue "\nPost successful!\n";
     get_command ()
   with

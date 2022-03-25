@@ -43,3 +43,6 @@ val get_tweets : t -> post list
 
 val get_id : t -> int
 (** [get_id p] returns the id number in a list of posts [p].*)
+
+val increment : t -> t
+(**[increment p] increments the id number of a record of posts [p].*)

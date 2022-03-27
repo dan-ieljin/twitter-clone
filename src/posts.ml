@@ -126,7 +126,7 @@ let rec like_post_helper i post_lst post_lst_return =
 
 let like_post i post_lst =
   if last_id post_lst < i || i < 1 then raise PostNotFound
-  else like_post_helper i post_lst []
+  else List.rev (like_post_helper i post_lst [])
 
 (** [to_yojson p] converts a the data of a post [p] displayed in a
     record into a Yojson type association list. *)

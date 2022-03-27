@@ -4,6 +4,7 @@ type command =
   | Post
   | HomePage
   | Delete of int
+  | Like of int
   | Quit  (** | Search | ViewProfile | F *)
 
 exception Empty

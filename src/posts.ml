@@ -6,6 +6,8 @@ type post = {
   timestamp : string;
   id : int;
   username : string;
+  likes : int;
+  retweets : int;
 }
 
 type t = post list
@@ -41,6 +43,8 @@ let parse_record j =
     timestamp = j |> member "timestamp" |> to_string;
     id = j |> member "id" |> to_int;
     username = j |> member "username" |> to_string;
+    likes = j |> member "likes" |> to_int;
+    retweets = j |> member "retweets" |> to_int;
   }
 
 let from_json json : t =
@@ -62,6 +66,8 @@ let create_post s id_val =
     timestamp = date_and_time (Unix.localtime (Unix.time ()));
     id = id_val;
     username = "blank";
+    likes = 0;
+    retweets = 0;
   }
 
 let last_id (post_list : t) =
@@ -89,6 +95,39 @@ let rec delete_post id posts : t =
   | [] -> raise PostNotFound
   | h :: t -> if h.id = id then decr_ids t else h :: delete_post id t
 
+let rec like_post_helper i post_lst post_lst_return =
+  match post_lst with
+  | [] -> post_lst_return
+  | {
+      text = x;
+      hashtags = x2;
+      timestamp = x3;
+      id = idnum;
+      username = x4;
+      likes = l;
+      retweets = x5;
+    }
+    :: t ->
+      let h =
+        {
+          text = x;
+          hashtags = x2;
+          timestamp = x3;
+          id = idnum;
+          username = x4;
+          likes = l;
+          retweets = x5;
+        }
+      in
+      if idnum = i then
+        like_post_helper i post_lst
+          ({ h with likes = l + 1 } :: post_lst_return)
+      else like_post_helper i t post_lst_return
+
+let like_post i post_lst =
+  if last_id post_lst <= i then raise PostNotFound
+  else like_post_helper i post_lst post_lst
+
 (** [to_yojson p] converts a the data of a post [p] displayed in a
     record into a Yojson type association list. *)
 let to_yojson p : Yojson.Basic.t =
@@ -99,6 +138,8 @@ let to_yojson p : Yojson.Basic.t =
       ("timestamp", `String p.timestamp);
       ("id", `Int p.id);
       ("username", `String p.username);
+      ("likes", `Int p.likes);
+      ("retweets", `Int p.retweets);
     ]
 
 (** File containing the JSON represenation of post list. *)

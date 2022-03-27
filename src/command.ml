@@ -2,6 +2,7 @@ type command =
   | Post
   | HomePage
   | Delete of int
+  | Like of int
   | Quit
 (* | Search | ViewProfile *)
 
@@ -24,6 +25,11 @@ let parse str =
       | _ -> raise Invalid
     end
   | [ "quit" ] -> Quit
+  | "like" :: t -> begin
+      match t with
+      | [ x ] -> ( try Like (int_of_string x) with _ -> raise Invalid)
+      | _ -> raise Invalid
+    end
   | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid
 (* | [ "search" ] -> Search | [ "viewprofile" ] -> ViewProfile *)

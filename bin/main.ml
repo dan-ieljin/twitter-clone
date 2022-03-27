@@ -43,6 +43,16 @@ and get_command () =
         print_blue "\nWhat would you like to do?\n";
         get_command ()
     | Delete _ -> failwith "Unimplemented"
+    | Like i -> begin
+        try
+          posts |> from_json |> like_post i |> to_json;
+          print_blue ("\nPost" ^ string_of_int i ^ "liked.\n");
+          get_command ()
+        with PostNotFound ->
+          print_red
+            "\nNo such post exists. Please enter a new command.\n";
+          get_command ()
+      end
     | Quit ->
         print_blue "See you next time!\n";
         exit 0

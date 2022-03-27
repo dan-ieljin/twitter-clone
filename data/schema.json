@@ -23,13 +23,21 @@
           },
           "username": {
             "type": "string"
+          },
+          "likes": {
+            "type": "integer"
+          },
+          "retweets": {
+            "type": "integer"
           }
         },
         "required": [
           "tweet",
           "hashtags",
           "id",
-          "username"
+          "username",
+          "likes",
+          "retweets"
         ]
       }
     },

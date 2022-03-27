@@ -10,6 +10,8 @@ type post = {
   timestamp : string;
   id : int;
   username : string;
+  likes : int;
+  retweets : int;
 }
 (**The type of values representing posts. *)
 
@@ -51,3 +53,6 @@ val delete_post : int -> t -> t
 
 val to_json : t -> unit
 (** [to_json p] converts posts [t] into JSON file.*)
+
+val like_post : int -> t -> t
+(**[like_post i] adds a like to post [i].*)

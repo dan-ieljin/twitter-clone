@@ -32,13 +32,9 @@
           "username"
         ]
       }
-    },
-    "number": {
-      "type": "integer"
     }
   },
   "required": [
-    "posts",
-    "number"
+    "posts"
   ]
 }

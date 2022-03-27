@@ -76,13 +76,18 @@ let add_post s : t =
   let post_list =
     Yojson.Basic.from_file "data/posts.json" |> from_json
   in
-  try create_post s (last_id post_list + 1) :: post_list
+  try post_list @ [ create_post s (last_id post_list + 1) ]
   with InvalidPost "hashtag" -> raise (InvalidPost "hashtag")
 
 let rec delete_post id posts : t =
+  let decr_ids post_lst =
+    match post_lst with
+    | [] -> []
+    | h :: t -> List.map (fun x -> { x with id = x.id - 1 }) (h :: t)
+  in
   match posts with
   | [] -> raise PostNotFound
-  | h :: t -> if h.id = id then t else h :: delete_post id t
+  | h :: t -> if h.id = id then decr_ids t else h :: delete_post id t
 
 (** [to_yojson p] converts a the data of a post [p] displayed in a
     record into a Yojson type association list. *)

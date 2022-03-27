@@ -28,21 +28,32 @@ let rec post () =
       print_blue "Please enter a new post:\n";
       post ()
 
+and delete id posts =
+  try
+    delete_post id (from_json posts) |> to_json;
+    print_blue "Post deleted";
+    get_command ()
+  with PostNotFound ->
+    print_red "\nThis post id is invalid. Please try again.\n";
+    get_command ()
+
 and get_command () =
   let posts = Yojson.Basic.from_file "data/posts.json" in
   print_blue
-    "\nWhat would you like to do? Commands: post, homepage, quit.\n";
+    "\n\
+     What would you like to do? Commands: post, homepage, delete, quit.\n";
   try
     match parse (read_line ()) with
     | Post ->
         print_blue "\nEnter a post:\n";
+        print_endline "Note: Hashtags must be separated by a space.\n";
         post ()
     | HomePage ->
         print_blue "\nMain Feed:\n";
         Yojson.Basic.pretty_print Format.std_formatter posts;
         print_blue "\nWhat would you like to do?\n";
         get_command ()
-    | Delete _ -> failwith "Unimplemented"
+    | Delete id -> delete id posts
     | Quit ->
         print_blue "See you next time!\n";
         exit 0

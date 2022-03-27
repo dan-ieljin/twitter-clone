@@ -1,22 +1,31 @@
 {
   "posts": [
     {
-      "tweet": "#twitter #cs3110",
-      "hashtags": [
-        "#twitter",
-        "#cs3110"
-      ],
-      "timestamp": "8:19 PM 2/26/2022",
+      "tweet": "hi",
+      "hashtags": [],
+      "timestamp": "4:09 PM 2/27/2022",
+      "id": 1,
+      "username": "blank"
+    },
+    {
+      "tweet": "hi",
+      "hashtags": [],
+      "timestamp": "4:09 PM 2/27/2022",
       "id": 2,
       "username": "blank"
     },
     {
-      "tweet": "first tweet! #hello",
-      "hashtags": [
-        "#hello"
-      ],
-      "timestamp": "8:19 PM 2/26/2022",
-      "id": 1,
+      "tweet": "twitter",
+      "hashtags": [],
+      "timestamp": "4:09 PM 2/27/2022",
+      "id": 3,
+      "username": "blank"
+    },
+    {
+      "tweet": "hola",
+      "hashtags": [],
+      "timestamp": "4:10 PM 2/27/2022",
+      "id": 4,
       "username": "blank"
     }
   ]

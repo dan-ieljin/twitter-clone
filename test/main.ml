@@ -72,14 +72,10 @@ let posts_tests =
   [
     date_and_time_test "Date and time 1" tm_1 "11:11 AM 11/11/2011";
     date_and_time_test "Date and time 2" tm_2 "1:01 PM 1/1/2011";
-    create_post_test "Test 1" "test post #hi" 0
-      {
-        text = "test post #hi";
-        hashtags = [ "#hi" ];
-        timestamp = date_and_time (Unix.localtime (Unix.time ()));
-        id = 0;
-        username = "blank";
-      };
+    (* create_post_test "Test 1" "test post #hi" 0 { text = "test post
+       #hi"; hashtags = [ "#hi" ]; timestamp = date_and_time
+       (Unix.localtime (Unix.time ())); id = 0; username = "blank";
+       }; *)
     hashtags_test "One hashtag: #twitter" "Hello world #twitter"
       [ "#twitter" ];
     hashtags_test "One hashtag: #hello" "hi #hello" [ "#hello" ];

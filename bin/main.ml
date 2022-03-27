@@ -53,10 +53,7 @@ and get_command () =
         Yojson.Basic.pretty_print Format.std_formatter posts;
         print_blue "\nWhat would you like to do?\n";
         get_command ()
-<<<<<<< HEAD
     | Delete id -> delete id posts
-=======
-    | Delete _ -> failwith "Unimplemented"
     | Like i -> begin
         try
           posts |> from_json |> like_post i |> to_json;
@@ -67,7 +64,6 @@ and get_command () =
             "\nNo such post exists. Please enter a new command.\n";
           get_command ()
       end
->>>>>>> 3a21376a66ce19ac4aae10df99c4c07d3721a810
     | Quit ->
         print_blue "See you next time!\n";
         exit 0

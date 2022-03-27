@@ -1,21 +1,23 @@
 {
   "posts": [
     {
-      "tweet": "hi #hi",
+      "tweet": "#twitter #cs3110",
       "hashtags": [
-        "#hi"
+        "#twitter",
+        "#cs3110"
       ],
-      "timestamp": "10:10 PM 2/22/2022",
-      "id": 0,
+      "timestamp": "8:19 PM 2/26/2022",
+      "id": 2,
       "username": "blank"
     },
     {
-      "tweet": "first tweet",
-      "hashtags": [],
-      "timestamp": "5:30 PM 2/14/2022",
+      "tweet": "first tweet! #hello",
+      "hashtags": [
+        "#hello"
+      ],
+      "timestamp": "8:19 PM 2/26/2022",
       "id": 1,
-      "username": "purit"
+      "username": "blank"
     }
-  ],
-  "number": 2
+  ]
 }

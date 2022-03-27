@@ -24,7 +24,8 @@ let date_and_time_test
     (name : string)
     (tm : Unix.tm)
     (expected_output : string) : test =
-  name >:: fun _ -> assert_equal expected_output (date_and_time tm)
+  name >:: fun _ ->
+  assert_equal ~printer:pp_string expected_output (date_and_time tm)
 
 let hashtags_test
     (name : string)
@@ -34,9 +35,12 @@ let hashtags_test
   assert_equal ~printer:(pp_list pp_string) expected_output
     (hashtags text)
 
-(* let create_post_test (name : string) (post : post) (expected_output :
-   string * string list * string * int * string) : test = name >:: fun _
-   -> assert_equal expected_output (get_tweet post) *)
+let create_post_test
+    (name : string)
+    (post : string)
+    (id : int)
+    (expected_output : post) : test =
+  name >:: fun _ -> assert_equal expected_output (create_post post id)
 
 let tm_1 : Unix.tm =
   {
@@ -45,7 +49,7 @@ let tm_1 : Unix.tm =
     tm_hour = 11;
     tm_mday = 11;
     tm_mon = 11;
-    tm_year = 2011;
+    tm_year = 111;
     tm_wday = 1;
     tm_yday = 1;
     tm_isdst = false;
@@ -53,29 +57,29 @@ let tm_1 : Unix.tm =
 
 let tm_2 : Unix.tm =
   {
-    tm_sec = 11;
-    tm_min = 11;
-    tm_hour = 23;
-    tm_mday = 11;
-    tm_mon = 11;
-    tm_year = 2011;
+    tm_sec = 1;
+    tm_min = 1;
+    tm_hour = 13;
+    tm_mday = 1;
+    tm_mon = 1;
+    tm_year = 111;
     tm_wday = 1;
     tm_yday = 1;
     tm_isdst = false;
   }
 
-let time_tests =
-  [ (*date_and_time_test "Date and time 1" tm_1 "11:11 AM 11/11/2011";
-      date_and_time_test "Date and time 2" tm_2 "11:11 PM
-      11/11/2011"; *) ]
-
-let create_post_tests =
-  [ (* create_post_test "Test 1" (create_post "hello" [] 0) ( "hello",
-       [], date_and_time (Unix.localtime (Unix.time ())), 0, "blank"
-       ); *) ]
-
 let posts_tests =
   [
+    date_and_time_test "Date and time 1" tm_1 "11:11 AM 11/11/2011";
+    date_and_time_test "Date and time 2" tm_2 "1:01 PM 1/1/2011";
+    create_post_test "Test 1" "test post #hi" 0
+      {
+        text = "test post #hi";
+        hashtags = [ "#hi" ];
+        timestamp = date_and_time (Unix.localtime (Unix.time ()));
+        id = 0;
+        username = "blank";
+      };
     hashtags_test "One hashtag: #twitter" "Hello world #twitter"
       [ "#twitter" ];
     hashtags_test "One hashtag: #hello" "hi #hello" [ "#hello" ];

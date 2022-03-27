@@ -8,12 +8,10 @@ type post = {
   username : string;
 }
 
-type t = {
-  posts : post list;
-  id_number : int;
-}
+type t = post list
 
 exception InvalidPost of string
+exception PostNotFound
 
 let get_date (tm : Unix.tm) =
   let month = string_of_int tm.tm_mon in
@@ -35,9 +33,6 @@ let get_time (tm : Unix.tm) =
 
 let date_and_time tm = get_time tm ^ " " ^ get_date tm
 
-let get_tweet post =
-  (post.text, post.hashtags, post.timestamp, post.id, post.username)
-
 (**[parse_record j] helps parse the post text, hashtags, and timestamp.*)
 let parse_record j =
   {
@@ -48,14 +43,8 @@ let parse_record j =
     username = j |> member "username" |> to_string;
   }
 
-let parse_file j =
-  {
-    posts = j |> member "posts" |> to_list |> List.map parse_record;
-    id_number = j |> member "number" |> to_int;
-  }
-
 let from_json json : t =
-  try parse_file json
+  try json |> member "posts" |> to_list |> List.map parse_record
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
 let hashtags s =
@@ -75,20 +64,25 @@ let create_post s id_val =
     username = "blank";
   }
 
-let get_tweets p = p.posts
-let get_id p = p.id_number
-let increment p = { p with id_number = p.id_number + 1 }
+let last_id (post_list : t) =
+  if List.length post_list = 0 then 0
+  else (List.nth post_list (List.length post_list - 1)).id
 
-let add_post s id =
+let add_post s : t =
   let length = s |> String.trim |> String.length in
   if length > 280 then raise (InvalidPost "Too long")
   else if length <= 0 then raise (InvalidPost "Too short");
 
   let post_list =
-    Yojson.Basic.from_file "data/posts.json" |> from_json |> get_tweets
+    Yojson.Basic.from_file "data/posts.json" |> from_json
   in
-  try create_post s id :: post_list
+  try create_post s (last_id post_list + 1) :: post_list
   with InvalidPost "hashtag" -> raise (InvalidPost "hashtag")
+
+let rec delete_post id posts : t =
+  match posts with
+  | [] -> raise PostNotFound
+  | h :: t -> if h.id = id then t else h :: delete_post id t
 
 (** [to_yojson p] converts a the data of a post [p] displayed in a
     record into a Yojson type association list. *)
@@ -105,13 +99,9 @@ let to_yojson p : Yojson.Basic.t =
 (** File containing the JSON represenation of post list. *)
 let file = "data/posts.json"
 
-let to_json id_num post_list =
-  let json_output post_list : Yojson.Basic.t =
-    `Assoc
-      [
-        ("posts", `List (List.map to_yojson post_list));
-        ("number", `Int id_num);
-      ]
+let to_json post_list =
+  let json_output (post_list : t) : Yojson.Basic.t =
+    `Assoc [ ("posts", `List (List.map to_yojson post_list)) ]
   in
   let yojson_post = json_output post_list in
   let oc = open_out file in

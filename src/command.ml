@@ -1,8 +1,9 @@
 type command =
   | Post
   | HomePage
+  | Delete of int
   | Quit
-(* | Search | ViewProfile | DeleteMyPost*)
+(* | Search | ViewProfile *)
 
 exception Empty
 exception Invalid
@@ -16,8 +17,13 @@ let parse str =
   match remove_whitespace txt_lst with
   | [ "post" ] -> Post
   | [ "homepage" ] -> HomePage
+  | "delete" :: t -> begin
+      match t with
+      | [ x ] -> (
+          try Delete (int_of_string x) with _ -> raise Invalid)
+      | _ -> raise Invalid
+    end
   | [ "quit" ] -> Quit
   | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid
-(* | [ "search" ] -> Search | [ "viewprofile" ] -> ViewProfile | [
-   "deletemypost" ] -> DeleteMyPost *)
+(* | [ "search" ] -> Search | [ "viewprofile" ] -> ViewProfile *)

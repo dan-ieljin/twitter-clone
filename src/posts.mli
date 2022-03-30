@@ -15,7 +15,7 @@ type post = {
 }
 (**The type of values representing posts. *)
 
-type t
+type t = post list
 (**The abstract list of values representing a list of posts*)
 
 exception InvalidPost of string
@@ -31,7 +31,7 @@ val date_and_time : Unix.tm -> string
 val hashtags : string -> string list
 (** [hashtags s] is the list of hashtags in string s *)
 
-val create_post : string -> int -> post
+val create_post : string -> int -> string -> post
 (** [create_post s lst] creates a record of type post with [s] as its
     textual content, [lst] as its hashtags, and [id_val] as its id.
     Raises: [InvalidPost p] if the length of [s] > 280 or [s] is the
@@ -42,7 +42,7 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
-val add_post : string -> t
+val add_post : string -> string -> t
 (** [add_post s] is the data structure represeting posts with a post of
     text [s] added. *)
 
@@ -56,3 +56,7 @@ val to_json : t -> unit
 
 val like_post : int -> t -> t
 (**[like_post i] adds a like to post [i].*)
+
+val pp_posts : post list -> string
+val search_posts : string -> post list -> post list
+val user_posts : string -> post list -> post list

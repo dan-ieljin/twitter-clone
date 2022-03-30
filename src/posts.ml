@@ -57,7 +57,7 @@ let hashtags s =
   in
   List.filter (fun x -> x.[0] = '#') text_list
 
-let create_post s id_val =
+let create_post s id_val user =
   {
     text = s;
     hashtags =
@@ -65,7 +65,7 @@ let create_post s id_val =
       else raise (InvalidPost "hashtag"));
     timestamp = date_and_time (Unix.localtime (Unix.time ()));
     id = id_val;
-    username = "blank";
+    username = user;
     likes = 0;
     retweets = 0;
   }
@@ -74,7 +74,7 @@ let last_id (post_list : t) =
   if List.length post_list = 0 then 0
   else (List.nth post_list (List.length post_list - 1)).id
 
-let add_post s : t =
+let add_post s user : t =
   let length = s |> String.trim |> String.length in
   if length > 280 then raise (InvalidPost "Too long")
   else if length <= 0 then raise (InvalidPost "Too short");
@@ -82,7 +82,7 @@ let add_post s : t =
   let post_list =
     Yojson.Basic.from_file "data/posts.json" |> from_json
   in
-  try post_list @ [ create_post s (last_id post_list + 1) ]
+  try post_list @ [ create_post s (last_id post_list + 1) user ]
   with InvalidPost "hashtag" -> raise (InvalidPost "hashtag")
 
 let rec delete_post id posts : t =
@@ -153,3 +153,37 @@ let to_json post_list =
   let oc = open_out file in
   Yojson.Basic.to_channel oc yojson_post;
   close_out oc
+
+let pp_posts (lst : post list) =
+  let pp_elt (post : post) =
+    "Post [" ^ string_of_int post.id ^ "] by " ^ post.username ^ " at "
+    ^ post.timestamp ^ "\n" ^ post.text ^ "\n\n"
+  in
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (h2 :: t as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
+    in
+    loop 0 "" lst
+  in
+  pp_elts lst
+
+let is_substr str sub =
+  let reg = Str.regexp_string sub in
+  try
+    ignore (Str.search_forward reg str 0);
+    true
+  with Not_found -> false
+
+let rec search_posts (key : string) (lst : post list) =
+  match lst with
+  | [] -> []
+  | post :: t ->
+      if is_substr post.text key then post :: search_posts key t
+      else search_posts key t
+
+let rec user_posts (user : string) (lst : post list) =
+  List.filter (fun post -> post.username = user) lst

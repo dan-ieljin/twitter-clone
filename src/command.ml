@@ -3,8 +3,9 @@ type command =
   | HomePage
   | Delete of int
   | Like of int
+  | ViewProfile
+  | Search of string
   | Quit
-(* | Search | ViewProfile *)
 
 exception Empty
 exception Invalid
@@ -18,6 +19,7 @@ let parse str =
   match remove_whitespace txt_lst with
   | [ "post" ] -> Post
   | [ "homepage" ] -> HomePage
+  | [ "create profile" ] -> Post
   | "delete" :: t -> begin
       match t with
       | [ x ] -> (

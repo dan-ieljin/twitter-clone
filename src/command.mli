@@ -5,7 +5,9 @@ type command =
   | HomePage
   | Delete of int
   | Like of int
-  | Quit  (** | Search | ViewProfile | F *)
+  | ViewProfile
+  | Search of string
+  | Quit
 
 exception Empty
 exception Invalid

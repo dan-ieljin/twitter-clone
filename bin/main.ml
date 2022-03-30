@@ -66,7 +66,8 @@ and get_command user =
   let posts = Yojson.Basic.from_file "data/posts.json" in
   print_blue
     "\n\
-     What would you like to do? Commands: post, homepage, delete, quit.\n";
+     What would you like to do? Commands: post, homepage, delete, \
+     like, quit.\n";
   try
     match parse (read_line ()) with
     | Post ->
@@ -82,7 +83,7 @@ and get_command user =
     | Like i -> begin
         try
           posts |> from_json |> like_post i |> to_json;
-          print_blue ("\nPost" ^ string_of_int i ^ "liked.\n");
+          print_blue ("\nPost " ^ string_of_int i ^ " liked.\n");
           get_command user
         with PostNotFound ->
           print_red

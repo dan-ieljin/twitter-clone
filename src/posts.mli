@@ -55,7 +55,8 @@ val to_json : t -> unit
 (** [to_json p] converts posts [t] into JSON file.*)
 
 val like_post : int -> t -> t
-(**[like_post i] adds a like to post [i].*)
+(**[like_post i] adds a like to post [i]. Requires: [i] is greater than
+   0 and smaller than the greatest post id.*)
 
 val pp_posts : post list -> string
 val search_posts : string -> post list -> post list

@@ -120,13 +120,13 @@ let rec like_post_helper i post_lst post_lst_return =
         }
       in
       if idnum = i then
-        like_post_helper i post_lst
+        like_post_helper i t
           ({ h with likes = l + 1 } :: post_lst_return)
-      else like_post_helper i t post_lst_return
+      else like_post_helper i t (h :: post_lst_return)
 
 let like_post i post_lst =
-  if last_id post_lst <= i then raise PostNotFound
-  else like_post_helper i post_lst post_lst
+  if last_id post_lst < i || i < 1 then raise PostNotFound
+  else List.rev (like_post_helper i post_lst [])
 
 (** [to_yojson p] converts a the data of a post [p] displayed in a
     record into a Yojson type association list. *)

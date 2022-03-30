@@ -1,7 +1,6 @@
 open Twitter
 open Posts
 open Command
-open User
 
 let print_blue s =
   ANSITerminal.print_string [ ANSITerminal.cyan ] (s ^ "\n")
@@ -18,7 +17,7 @@ let rec get_user step arr =
          Example: \n\
          Alex Smith\n\
          smith22\n\
-         I like eating grapes.";
+         I like eating grapes.\n";
       arr.(0) <- read_line ();
       get_user 1 arr
   | 1 ->
@@ -67,7 +66,7 @@ and get_command user =
   print_blue
     "\n\
      What would you like to do? Commands: post, homepage, delete, \
-     like, quit.\n";
+     like, quit, myprofile, search _.\n";
   try
     match parse (read_line ()) with
     | Post ->

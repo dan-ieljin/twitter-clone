@@ -163,7 +163,7 @@ let pp_posts (lst : post list) =
     let rec loop n acc = function
       | [] -> acc
       | [ h ] -> acc ^ pp_elt h
-      | h1 :: (h2 :: t as t') ->
+      | h1 :: (_ :: _ as t') ->
           if n = 100 then acc ^ "..." (* stop printing long list *)
           else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
     in
@@ -185,5 +185,5 @@ let rec search_posts (key : string) (lst : post list) =
       if is_substr post.text key then post :: search_posts key t
       else search_posts key t
 
-let rec user_posts (user : string) (lst : post list) =
+let user_posts (user : string) (lst : post list) =
   List.filter (fun post -> post.username = user) lst

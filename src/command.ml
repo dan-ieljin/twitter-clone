@@ -12,6 +12,12 @@ exception Invalid
 
 let remove_whitespace lst = List.filter (fun x -> x <> "") lst
 
+let rec phrase_to_str phr =
+  match phr with
+  | [] -> ""
+  | [ word ] -> word
+  | word :: t -> word ^ " " ^ phrase_to_str t
+
 (** Convert user input into a command. *)
 let parse str =
   let text = String.lowercase_ascii str in
@@ -19,7 +25,8 @@ let parse str =
   match remove_whitespace txt_lst with
   | [ "post" ] -> Post
   | [ "homepage" ] -> HomePage
-  | [ "create profile" ] -> Post
+  | [ "myprofile" ] -> ViewProfile
+  | "search " :: key_lst -> Search (phrase_to_str key_lst)
   | "delete" :: t -> begin
       match t with
       | [ x ] -> (
@@ -34,4 +41,3 @@ let parse str =
     end
   | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid
-(* | [ "search" ] -> Search | [ "viewprofile" ] -> ViewProfile *)

@@ -165,7 +165,7 @@ let pp_posts (lst : post list) =
       | [ h ] -> acc ^ pp_elt h
       | h1 :: (_ :: _ as t') ->
           if n = 100 then acc ^ "..." (* stop printing long list *)
-          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
+          else loop (n + 1) (acc ^ pp_elt h1) t'
     in
     loop 0 "" lst
   in

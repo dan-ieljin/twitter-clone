@@ -95,8 +95,8 @@ and get_command user =
   print_blue
     "\n\
      What would you like to do? \n\
-     Commands: post, homepage, sort, delete, like, quit, myprofile, \
-     search _.\n";
+     Commands: post, homepage, sort, delete, like, retweet, quit, \
+     myprofile, search _.\n";
   try
     match parse (read_line ()) with
     | Post ->
@@ -117,10 +117,34 @@ and get_command user =
           posts |> from_json |> like_post i |> to_json;
           print_green ("\nPost " ^ string_of_int i ^ " liked.\n");
           get_command user
-        with PostNotFound ->
-          print_red
-            "\nNo such post exists. Please enter a new command.\n";
+        with
+        | PostNotFound ->
+            print_red
+              "\nNo such post exists. Please enter a new command.\n";
+            get_command user
+        | IsARetweet ->
+            print_red
+              "\n\
+               Not a valid command on a retweet. Please enter a new \
+               command.\n";
+            get_command user
+      end
+    | Retweet i -> begin
+        try
+          posts |> from_json |> retweet_post i |> to_json;
+          print_green ("\nPost " ^ string_of_int i ^ " retweeted.\n");
           get_command user
+        with
+        | PostNotFound ->
+            print_red
+              "\nNo such post exists. Please enter a new command.\n";
+            get_command user
+        | IsARetweet ->
+            print_red
+              "\n\
+               Not a valid command on a retweet. Please enter a new \
+               command.\n";
+            get_command user
       end
     | ViewProfile ->
         print_endline (pp_posts (user_posts user (posts |> from_json)));

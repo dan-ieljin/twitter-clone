@@ -12,6 +12,7 @@ type post = {
   username : string;
   likes : int;
   retweets : int;
+  is_retweet : bool;
 }
 (**The type of values representing posts. *)
 
@@ -23,6 +24,9 @@ exception InvalidPost of string
 
 exception PostNotFound
 (** Raised when a post of a specified id does not exist. *)
+
+exception IsARetweet
+(** Raised when a post that is a retweet is liked or retweeted.*)
 
 val date_and_time : Unix.tm -> string
 (** [date_and_time] gets a user's local date and time then converts it
@@ -55,8 +59,9 @@ val to_json : t -> unit
 (** [to_json p] converts posts [p] into JSON file.*)
 
 val like_post : int -> t -> t
-(** [like_post i] adds a like to post [i]. Requires: [i] is greater than
-    0 and smaller than the greatest post id.*)
+(** [like_post i p] adds a like to post with the id [i] and returns the
+    new post list [p] with the updated like count. Requires: [i] is
+    greater than 0 and smaller than the greatest post id.*)
 
 val sort_newest : t -> t
 (** [sort_newest p] sorts posts [p] from newest to oldest. *)
@@ -69,3 +74,9 @@ val sort_likes : t -> t
 
 val search_posts : string -> t -> t
 val user_posts : string -> t -> t
+
+val retweet_post : int -> t -> t
+(** [retweet_post i p] adds a retweet to the post with the id [i] and
+    returns the new updated post list [p] with the updated retweet count
+    and the retweeted post. Requires: [i] is greater than 0 and smaller
+    than the greatest post id.*)

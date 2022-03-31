@@ -5,6 +5,7 @@ type command =
   | HomePage
   | Delete of int
   | Like of int
+  | Retweet of int
   | ViewProfile
   | Search of string
   | Sort

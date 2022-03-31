@@ -8,12 +8,14 @@ type post = {
   username : string;
   likes : int;
   retweets : int;
+  is_retweet : bool;
 }
 
 type t = post list
 
 exception InvalidPost of string
 exception PostNotFound
+exception IsARetweet
 
 let get_date (tm : Unix.tm) =
   let month = string_of_int tm.tm_mon in
@@ -46,6 +48,7 @@ let parse_record j =
     username = j |> member "username" |> to_string;
     likes = j |> member "likes" |> to_int;
     retweets = j |> member "retweets" |> to_int;
+    is_retweet = j |> member "is retweet" |> to_bool;
   }
 
 let from_json json : t =
@@ -69,6 +72,7 @@ let create_post s id_val user =
     username = user;
     likes = 0;
     retweets = 0;
+    is_retweet = false;
   }
 
 let last_id (post_list : t) =
@@ -96,6 +100,9 @@ let rec delete_post id posts : t =
   | [] -> raise PostNotFound
   | h :: t -> if h.id = id then decr_ids t else h :: delete_post id t
 
+(**[like_post_helper i p r] is a helper method for [like_post] that
+   returns a post list [r] with the the updated like count of the post
+   with the id [i] contained in post list [p].*)
 let rec like_post_helper i post_lst post_lst_return =
   match post_lst with
   | [] -> post_lst_return
@@ -107,6 +114,7 @@ let rec like_post_helper i post_lst post_lst_return =
       username = x4;
       likes = l;
       retweets = x5;
+      is_retweet = x6;
     }
     :: t ->
       let h =
@@ -118,11 +126,13 @@ let rec like_post_helper i post_lst post_lst_return =
           username = x4;
           likes = l;
           retweets = x5;
+          is_retweet = x6;
         }
       in
-      if idnum = i then
+      if idnum = i && x6 = false then
         like_post_helper i t
           ({ h with likes = l + 1 } :: post_lst_return)
+      else if idnum = i && x6 = true then raise IsARetweet
       else like_post_helper i t (h :: post_lst_return)
 
 let like_post i post_lst =
@@ -150,6 +160,7 @@ let to_yojson p : Yojson.Basic.t =
       ("username", `String p.username);
       ("likes", `Int p.likes);
       ("retweets", `Int p.retweets);
+      ("is retweet", `Bool p.is_retweet);
     ]
 
 (** File containing the JSON represenation of post list. *)
@@ -180,3 +191,59 @@ let rec search_posts (key : string) (lst : t) : t =
 
 let user_posts (user : string) (lst : t) : t =
   List.filter (fun post -> post.username = user) lst
+
+(**[get_id p] returns the id of post [p].*)
+let get_id p = p.id
+
+(**[get_text p] returns the text of post [p].*)
+let get_text p = p.text
+
+let rec get_post_retweet i post_lst id_last =
+  match post_lst with
+  | [] -> raise PostNotFound
+  | h :: t ->
+      if get_id h = i then
+        {
+          h with
+          is_retweet = true;
+          text = "Retweet: " ^ get_text h;
+          id = id_last + 1;
+        }
+      else get_post_retweet i t id_last
+
+let rec retweet_post_helper i post_lst post_lst_return id_last =
+  match post_lst with
+  | [] -> get_post_retweet i post_lst_return id_last :: post_lst_return
+  | {
+      text = x;
+      hashtags = x2;
+      timestamp = x3;
+      id = idnum;
+      username = x4;
+      likes = l;
+      retweets = r;
+      is_retweet = x6;
+    }
+    :: t ->
+      let h =
+        {
+          text = x;
+          hashtags = x2;
+          timestamp = x3;
+          id = idnum;
+          username = x4;
+          likes = l;
+          retweets = r;
+          is_retweet = x6;
+        }
+      in
+      if idnum = i && x6 = false then
+        retweet_post_helper i t
+          ({ h with retweets = r + 1 } :: post_lst_return)
+          id_last
+      else if idnum = i && x6 = true then raise IsARetweet
+      else retweet_post_helper i t (h :: post_lst_return) id_last
+
+let retweet_post i post_lst =
+  if last_id post_lst < i || i < 1 then raise PostNotFound
+  else List.rev (retweet_post_helper i post_lst [] (last_id post_lst))

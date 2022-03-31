@@ -3,6 +3,7 @@ type command =
   | HomePage
   | Delete of int
   | Like of int
+  | Retweet of int
   | ViewProfile
   | Search of string
   | Sort
@@ -43,6 +44,12 @@ let parse str =
   | "like" :: t -> begin
       match t with
       | [ x ] -> ( try Like (int_of_string x) with _ -> raise Invalid)
+      | _ -> raise Invalid
+    end
+  | "retweet" :: t -> begin
+      match t with
+      | [ x ] -> (
+          try Retweet (int_of_string x) with _ -> raise Invalid)
       | _ -> raise Invalid
     end
   | [ "sort" ] -> Sort

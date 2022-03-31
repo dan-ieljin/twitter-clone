@@ -1,4 +1,4 @@
 (library
  (name twitter)
  (public_name Twitter)
- (libraries yojson unix ANSITerminal Str))
+ (libraries yojson unix ANSITerminal str))

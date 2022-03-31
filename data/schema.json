@@ -29,6 +29,9 @@
           },
           "retweets": {
             "type": "integer"
+          },
+          "is retweet": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -37,7 +40,8 @@
           "id",
           "username",
           "likes",
-          "retweets"
+          "retweets",
+          "is retweet"
         ]
       }
     }

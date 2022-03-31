@@ -129,10 +129,10 @@ let like_post i post_lst =
   if last_id post_lst < i || i < 1 then raise PostNotFound
   else List.rev (like_post_helper i post_lst [])
 
-let sort_newest (posts : t) : t =
+let sort_oldest (posts : t) : t =
   List.sort (fun x y -> x.id - y.id) posts
 
-let sort_oldest (posts : t) : t =
+let sort_newest (posts : t) : t =
   List.sort (fun x y -> y.id - x.id) posts
 
 let sort_likes (posts : t) =

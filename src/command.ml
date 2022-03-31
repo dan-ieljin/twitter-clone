@@ -32,7 +32,7 @@ let parse str =
   | [ "post" ] -> Post
   | [ "homepage" ] -> HomePage
   | [ "myprofile" ] -> ViewProfile
-  | "search " :: key_lst -> Search (phrase_to_str key_lst)
+  | "search" :: key_lst -> Search (phrase_to_str key_lst)
   | "delete" :: t -> begin
       match t with
       | [ x ] -> (

@@ -8,6 +8,30 @@ let print_blue s =
 let print_red s =
   ANSITerminal.print_string [ ANSITerminal.red ] (s ^ "\n")
 
+let print_green s =
+  ANSITerminal.print_string [ ANSITerminal.green ] (s ^ "\n")
+
+let pp_posts (lst : t) =
+  let pp_elt (post : post) =
+    "\n@" ^ post.username ^ "  Id: " ^ string_of_int post.id ^ "\n"
+    ^ post.timestamp ^ "\n\n\"" ^ post.text ^ "\"\n\n" ^ "Likes: "
+    ^ string_of_int post.likes
+    ^ "  Retweets: "
+    ^ string_of_int post.retweets
+    ^ "\n\n"
+  in
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (_ :: _ as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1) t'
+    in
+    loop 0 "" lst
+  in
+  pp_elts lst
+
 let rec get_user step arr =
   match step with
   | 0 ->
@@ -36,7 +60,7 @@ let rec post user =
   let p = read_line () in
   try
     add_post p user |> to_json;
-    print_blue "\nPost successful!\n";
+    print_green "\nPost successful!\n";
     get_command user
   with
   | InvalidPost "Too long" ->
@@ -63,26 +87,35 @@ and delete id posts user =
 
 and get_command user =
   let posts = Yojson.Basic.from_file "data/posts.json" in
+  let print_homepage t =
+    print_blue "\nMain Feed:\n";
+    print_endline (pp_posts t);
+    get_command user
+  in
   print_blue
     "\n\
-     What would you like to do? Commands: post, homepage, delete, \
-     like, quit, myprofile, search _.\n";
+     What would you like to do? \n\
+     Commands: post, homepage, sort, delete, like, quit, myprofile, \
+     search _.\n";
   try
     match parse (read_line ()) with
     | Post ->
         print_blue "\nEnter a post:\n";
         print_endline "Note: Hashtags must be separated by a space.\n";
         post user
-    | HomePage ->
-        print_blue "\nMain Feed:\n";
-        Yojson.Basic.pretty_print Format.std_formatter posts;
-        print_blue "\nWhat would you like to do?\n";
-        get_command user
+    | HomePage -> print_homepage (from_json posts)
+    | Sort -> (
+        print_blue "\nHow would you like to sort?";
+        print_endline "\nCommands: Newest, Oldest, Likes\n";
+        match parse_sort (read_line ()) with
+        | Newest -> print_homepage (posts |> from_json |> sort_newest)
+        | Oldest -> print_homepage (posts |> from_json |> sort_oldest)
+        | Likes -> print_homepage (posts |> from_json |> sort_likes))
     | Delete id -> delete id posts user
     | Like i -> begin
         try
           posts |> from_json |> like_post i |> to_json;
-          print_blue ("\nPost " ^ string_of_int i ^ " liked.\n");
+          print_green ("\nPost " ^ string_of_int i ^ " liked.\n");
           get_command user
         with PostNotFound ->
           print_red

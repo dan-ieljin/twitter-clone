@@ -52,12 +52,20 @@ val delete_post : int -> t -> t
     does not exist. *)
 
 val to_json : t -> unit
-(** [to_json p] converts posts [t] into JSON file.*)
+(** [to_json p] converts posts [p] into JSON file.*)
 
 val like_post : int -> t -> t
-(**[like_post i] adds a like to post [i]. Requires: [i] is greater than
-   0 and smaller than the greatest post id.*)
+(** [like_post i] adds a like to post [i]. Requires: [i] is greater than
+    0 and smaller than the greatest post id.*)
 
-val pp_posts : post list -> string
-val search_posts : string -> post list -> post list
-val user_posts : string -> post list -> post list
+val sort_newest : t -> t
+(** [sort_newest p] sorts posts [p] from newest to oldest. *)
+
+val sort_oldest : t -> t
+(** [sort_oldest p] sorts posts [p] from oldest to newest. *)
+
+val sort_likes : t -> t
+(** [sort_likes p] sorts posts [p] from most to least likes. *)
+
+val search_posts : string -> t -> t
+val user_posts : string -> t -> t

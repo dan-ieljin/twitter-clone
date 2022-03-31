@@ -23,7 +23,8 @@ let get_date (tm : Unix.tm) =
 
 let get_time (tm : Unix.tm) =
   let hour =
-    if tm.tm_hour > 12 then string_of_int (tm.tm_hour mod 12)
+    if tm.tm_hour = 0 then string_of_int 12
+    else if tm.tm_hour > 12 then string_of_int (tm.tm_hour mod 12)
     else string_of_int tm.tm_hour
   in
   let minute =
@@ -128,6 +129,15 @@ let like_post i post_lst =
   if last_id post_lst < i || i < 1 then raise PostNotFound
   else List.rev (like_post_helper i post_lst [])
 
+let sort_newest (posts : t) : t =
+  List.sort (fun x y -> x.id - y.id) posts
+
+let sort_oldest (posts : t) : t =
+  List.sort (fun x y -> y.id - x.id) posts
+
+let sort_likes (posts : t) =
+  List.sort (fun x y -> y.likes - x.likes) posts
+
 (** [to_yojson p] converts a the data of a post [p] displayed in a
     record into a Yojson type association list. *)
 let to_yojson p : Yojson.Basic.t =
@@ -154,23 +164,6 @@ let to_json post_list =
   Yojson.Basic.to_channel oc yojson_post;
   close_out oc
 
-let pp_posts (lst : post list) =
-  let pp_elt (post : post) =
-    "Post [" ^ string_of_int post.id ^ "] by " ^ post.username ^ " at "
-    ^ post.timestamp ^ "\n" ^ post.text ^ "\n\n"
-  in
-  let pp_elts lst =
-    let rec loop n acc = function
-      | [] -> acc
-      | [ h ] -> acc ^ pp_elt h
-      | h1 :: (_ :: _ as t') ->
-          if n = 100 then acc ^ "..." (* stop printing long list *)
-          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
-    in
-    loop 0 "" lst
-  in
-  pp_elts lst
-
 let is_substr str sub =
   let reg = Str.regexp_string sub in
   try
@@ -178,12 +171,12 @@ let is_substr str sub =
     true
   with Not_found -> false
 
-let rec search_posts (key : string) (lst : post list) =
+let rec search_posts (key : string) (lst : t) : t =
   match lst with
   | [] -> []
   | post :: t ->
       if is_substr post.text key then post :: search_posts key t
       else search_posts key t
 
-let user_posts (user : string) (lst : post list) =
+let user_posts (user : string) (lst : t) : t =
   List.filter (fun post -> post.username = user) lst

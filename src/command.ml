@@ -5,7 +5,13 @@ type command =
   | Like of int
   | ViewProfile
   | Search of string
+  | Sort
   | Quit
+
+type sort_command =
+  | Newest
+  | Oldest
+  | Likes
 
 exception Empty
 exception Invalid
@@ -39,5 +45,15 @@ let parse str =
       | [ x ] -> ( try Like (int_of_string x) with _ -> raise Invalid)
       | _ -> raise Invalid
     end
+  | [ "sort" ] -> Sort
   | [] | [ "" ] | "" :: _ -> raise Empty
+  | _ -> raise Invalid
+
+let parse_sort str =
+  let text = String.lowercase_ascii str in
+  let txt_lst = String.split_on_char ' ' text in
+  match remove_whitespace txt_lst with
+  | [ "newest" ] -> Newest
+  | [ "oldest" ] -> Oldest
+  | [ "likes" ] -> Likes
   | _ -> raise Invalid

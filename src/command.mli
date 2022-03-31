@@ -7,10 +7,18 @@ type command =
   | Like of int
   | ViewProfile
   | Search of string
+  | Sort
   | Quit
+
+type sort_command =
+  | Newest
+  | Oldest
+  | Likes
 
 exception Empty
 exception Invalid
 
 val parse : string -> command
 (** Convert user input into a command. *)
+
+val parse_sort : string -> sort_command

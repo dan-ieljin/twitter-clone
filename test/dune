@@ -1,3 +1,5 @@
 (executable
  (name main)
- (libraries Twitter ounit2))
+ (libraries Twitter ounit2)
+ (instrumentation
+  (backend bisect_ppx)))

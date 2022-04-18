@@ -22,9 +22,16 @@ zip:
 	rm -f finalproject.zip
 	zip -r finalproject.zip . -x@exclude.lst
 
-clean:
+clean: bisect-clean
 	dune clean
 	rm -f finalproject.zip
+
+bisect: bisect-clean
+	-dune exec --instrument-with bisect_ppx --force test/main.exe
+	bisect-ppx-report html
+
+bisect-clean:
+	rm -rf _coverage bisect*.coverage
 
 doc:
 	dune build @doc

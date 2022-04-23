@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "name": "John Doe",
+      "username": "@johndoe",
+      "bio": "hi",
+      "id": 0,
+      "posts": []
+    },
+    {
+      "name": "Purit",
+      "username": "@purit",
+      "bio": "Hi",
+      "id": 0,
+      "posts": []
+    }
+  ]
+}

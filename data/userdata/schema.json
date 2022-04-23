@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "properties": {
+    "users": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "posts": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "username",
+          "bio",
+          "id",
+          "posts"
+        ]
+      }
+    }
+  },
+  "required": [
+    "users"
+  ]
+}

@@ -17,6 +17,13 @@ exception InvalidPost of string
 exception PostNotFound
 exception IsARetweet
 
+let text p = p.text
+let date_time p = p.timestamp
+let id p = p.id
+let username p = p.username
+let likes p = p.likes
+let retweets p = p.retweets
+
 let get_date (tm : Unix.tm) =
   let month = string_of_int tm.tm_mon in
   let day = string_of_int tm.tm_mday in
@@ -61,7 +68,8 @@ let hashtags s =
   in
   List.filter (fun x -> x.[0] = '#') text_list
 
-let create_post s id_val user =
+let create_post s id_val user_id =
+  let user = User.get_user user_id in
   {
     text = s;
     hashtags =
@@ -69,7 +77,7 @@ let create_post s id_val user =
       else raise (InvalidPost "hashtag"));
     timestamp = date_and_time (Unix.localtime (Unix.time ()));
     id = id_val;
-    username = user;
+    username = User.username user;
     likes = 0;
     retweets = 0;
     is_retweet = false;
@@ -189,8 +197,8 @@ let rec search_posts (key : string) (lst : t) : t =
       if is_substr post.text key then post :: search_posts key t
       else search_posts key t
 
-let user_posts (user : string) (lst : t) : t =
-  List.filter (fun post -> post.username = user) lst
+let get_posts (ids : int list) (lst : t) : t =
+  List.filter (fun post -> List.mem post.id ids) lst
 
 (**[get_id p] returns the id of post [p].*)
 let get_id p = p.id

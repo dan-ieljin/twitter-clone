@@ -4,29 +4,38 @@
     the contents of the post, date, time. It also handles loading that
     data from JSON and the functions to add and delete posts. *)
 
-type post = {
-  text : string;
-  hashtags : string list;
-  timestamp : string;
-  id : int;
-  username : string;
-  likes : int;
-  retweets : int;
-  is_retweet : bool;
-}
-(**The type of values representing posts. *)
+type post
+(** The type of values representing posts. *)
 
 type t = post list
-(**The abstract list of values representing a list of posts*)
+(** The abstract list of values representing a list of posts*)
 
 exception InvalidPost of string
-(**Raised when an input into a post is invalid. *)
+(** Raised when an input into a post is invalid. *)
 
 exception PostNotFound
 (** Raised when a post of a specified id does not exist. *)
 
 exception IsARetweet
 (** Raised when a post that is a retweet is liked or retweeted.*)
+
+val text : post -> string
+(** [text p] is the text of post p. *)
+
+val date_time : post -> string
+(** [time p] is the time and date stamp of post p. *)
+
+val id : post -> int
+(** [id p] is the id of post p. *)
+
+val username : post -> string
+(** [username p] is the username of the author of p. *)
+
+val likes : post -> int
+(** [likes p] is the number of likes of p. *)
+
+val retweets : post -> int
+(** [retweets p] is the number of retweets of p. *)
 
 val date_and_time : Unix.tm -> string
 (** [date_and_time] gets a user's local date and time then converts it
@@ -35,7 +44,7 @@ val date_and_time : Unix.tm -> string
 val hashtags : string -> string list
 (** [hashtags s] is the list of hashtags in string s *)
 
-val create_post : string -> int -> string -> post
+val create_post : string -> int -> int -> post
 (** [create_post s lst] creates a record of type post with [s] as its
     textual content, [lst] as its hashtags, and [id_val] as its id.
     Raises: [InvalidPost p] if the length of [s] > 280 or [s] is the
@@ -46,7 +55,7 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
-val add_post : string -> string -> t
+val add_post : string -> int -> t
 (** [add_post s] is the data structure represeting posts with a post of
     text [s] added. *)
 
@@ -73,7 +82,7 @@ val sort_likes : t -> t
 (** [sort_likes p] sorts posts [p] from most to least likes. *)
 
 val search_posts : string -> t -> t
-val user_posts : string -> t -> t
+val get_posts : int list -> t -> t
 
 val retweet_post : int -> t -> t
 (** [retweet_post i p] adds a retweet to the post with the id [i] and

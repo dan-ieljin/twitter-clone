@@ -39,9 +39,10 @@ let create_post_test
     (name : string)
     (post : string)
     (id : int)
+    (user : int)
     (expected_output : post) : test =
   name >:: fun _ ->
-  assert_equal expected_output (create_post post id "bob")
+  assert_equal expected_output (create_post post id user)
 
 let tm_1 : Unix.tm =
   {

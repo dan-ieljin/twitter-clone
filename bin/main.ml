@@ -1,4 +1,5 @@
 open Twitter
+open User
 open Posts
 open Command
 
@@ -13,11 +14,13 @@ let print_green s =
 
 let pp_posts (lst : t) =
   let pp_elt (post : post) =
-    "\n@" ^ post.username ^ "  Id: " ^ string_of_int post.id ^ "\n"
-    ^ post.timestamp ^ "\n\n\"" ^ post.text ^ "\"\n\n" ^ "Likes: "
-    ^ string_of_int post.likes
+    "\n@" ^ username post ^ "  Id: "
+    ^ string_of_int (Posts.id post)
+    ^ "\n" ^ date_time post ^ "\n\n\"" ^ text post ^ "\"\n\n"
+    ^ "Likes: "
+    ^ string_of_int (likes post)
     ^ "  Retweets: "
-    ^ string_of_int post.retweets
+    ^ string_of_int (retweets post)
     ^ "\n\n"
   in
   let pp_elts lst =
@@ -32,27 +35,13 @@ let pp_posts (lst : t) =
   in
   pp_elts lst
 
-let rec get_user step arr =
-  match step with
-  | 0 ->
-      print_blue
-        "Let's make a profile for you. Each on a separate line, please \
-         enter your full name, username, and biography. \n\
-         Example: \n\
-         Alex Smith\n\
-         smith22\n\
-         I like eating grapes.\n";
-      arr.(0) <- read_line ();
-      get_user 1 arr
-  | 1 ->
-      print_blue "";
-      arr.(1) <- read_line ();
-      get_user 2 arr
-  | 2 ->
-      print_blue "";
-      arr.(2) <- read_line ();
-      get_user 3 arr
-  | _ -> arr
+(* let rec get_user step arr = match step with | 0 -> print_blue "Let's
+   make a profile for you. Each on a separate line, please \ enter your
+   full name, username, and biography. \n\ Example: \n\ Alex Smith\n\
+   smith22\n\ I like eating grapes.\n"; arr.(0) <- read_line ();
+   get_user 1 arr | 1 -> print_blue ""; arr.(1) <- read_line ();
+   get_user 2 arr | 2 -> print_blue ""; arr.(2) <- read_line ();
+   get_user 3 arr | _ -> arr *)
 
 let show_results f key lst = print_endline (pp_posts (f key lst))
 
@@ -147,7 +136,12 @@ and get_command user =
             get_command user
       end
     | ViewProfile ->
-        print_endline (pp_posts (user_posts user (posts |> from_json)));
+        (* print_profile user; *)
+        print_endline
+          (pp_posts
+             (get_posts
+                (User.post_ids (get_user user))
+                (posts |> from_json)));
         get_command user
     | Search key ->
         show_results search_posts key (posts |> from_json);
@@ -159,9 +153,21 @@ and get_command user =
     print_red "\nInvalid command. Please enter a new command.\n";
     get_command user
 
+let create_profile () =
+  print_blue "\nName: ";
+  let name = read_line () in
+  print_blue "\nUsername: ";
+  let username = read_line () in
+  print_blue "\nBio: ";
+  let bio = read_line () in
+  let user = create_user name username bio in
+  user |> add_user |> User.to_json;
+  user
+
 let main () =
   print_blue "\nWelcome to Twitter.\n";
-  let info = get_user 0 [| ""; ""; "" |] in
-  get_command info.(0)
+  (* let info = get_user 0 [| ""; ""; "" |] in get_command info.(0) *)
+  let user = create_profile () in
+  get_command (User.id user)
 
 let () = main ()

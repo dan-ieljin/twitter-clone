@@ -5,6 +5,8 @@ type command =
   | Like of int
   | Retweet of int
   | ViewProfile
+  | Create
+  | Login
   | Search of string
   | Sort
   | Quit
@@ -33,6 +35,8 @@ let parse str =
   | [ "post" ] -> Post
   | [ "homepage" ] -> HomePage
   | [ "myprofile" ] -> ViewProfile
+  | [ "create"; "account" ] -> Create
+  | [ "login" ] -> Login
   | "search" :: key_lst -> Search (phrase_to_str key_lst)
   | "delete" :: t -> begin
       match t with

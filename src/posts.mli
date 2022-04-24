@@ -55,11 +55,11 @@ val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
     valid JSON post representation. *)
 
-val add_post : string -> int -> t
+val add_post : string -> int -> unit
 (** [add_post s] is the data structure represeting posts with a post of
     text [s] added. *)
 
-val delete_post : int -> t -> t
+val delete_post : int -> t -> int -> unit
 (** [delete_post id] is the data structure representing posts with the
     post of [id] removed. Raises: [PostNotFound] if a post with id [id]
     does not exist. *)
@@ -82,7 +82,7 @@ val sort_likes : t -> t
 (** [sort_likes p] sorts posts [p] from most to least likes. *)
 
 val search_posts : string -> t -> t
-val get_posts : int list -> t -> t
+val get_posts : int list -> t
 
 val retweet_post : int -> t -> t
 (** [retweet_post i p] adds a retweet to the post with the id [i] and

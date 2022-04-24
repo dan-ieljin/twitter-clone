@@ -12,6 +12,9 @@ let print_red s =
 let print_green s =
   ANSITerminal.print_string [ ANSITerminal.green ] (s ^ "\n")
 
+let print_invalid () =
+  print_red "\nInvalid command. Please enter a new command.\n"
+
 let pp_posts (lst : t) =
   let pp_elt (post : post) =
     "\n@" ^ username post ^ "  Id: "
@@ -48,7 +51,7 @@ let show_results f key lst = print_endline (pp_posts (f key lst))
 let rec post user =
   let p = read_line () in
   try
-    add_post p user |> to_json;
+    add_post p user;
     print_green "\nPost successful!\n";
     get_command user
   with
@@ -67,7 +70,7 @@ let rec post user =
 
 and delete id posts user =
   try
-    delete_post id (from_json posts) |> to_json;
+    delete_post id (from_json posts) user;
     print_blue "Post deleted";
     get_command user
   with PostNotFound ->
@@ -136,12 +139,9 @@ and get_command user =
             get_command user
       end
     | ViewProfile ->
-        (* print_profile user; *)
+        print_profile user;
         print_endline
-          (pp_posts
-             (get_posts
-                (User.post_ids (get_user user))
-                (posts |> from_json)));
+          (pp_posts (get_posts (User.post_ids (get_user user))));
         get_command user
     | Search key ->
         show_results search_posts key (posts |> from_json);
@@ -149,8 +149,11 @@ and get_command user =
     | Quit ->
         print_blue "See you next time!\n";
         exit 0
+    | Create | Login ->
+        print_invalid ();
+        get_command user
   with Invalid | Empty | _ ->
-    print_red "\nInvalid command. Please enter a new command.\n";
+    print_invalid ();
     get_command user
 
 let create_profile () =
@@ -158,16 +161,39 @@ let create_profile () =
   let name = read_line () in
   print_blue "\nUsername: ";
   let username = read_line () in
+  print_blue "\nPassword: ";
+  let password = read_line () in
   print_blue "\nBio: ";
   let bio = read_line () in
-  let user = create_user name username bio in
-  user |> add_user |> User.to_json;
+  let user = create_user name username password bio in
+  user |> add_user;
   user
 
-let main () =
-  print_blue "\nWelcome to Twitter.\n";
-  (* let info = get_user 0 [| ""; ""; "" |] in get_command info.(0) *)
-  let user = create_profile () in
-  get_command (User.id user)
+let rec login_page () =
+  print_blue "\nEnter your username: ";
+  let username = read_line () in
+  print_blue "\nEnter your password: ";
+  let password = read_line () in
+  try
+    let user = auth_user username password in
+    get_command (User.id user)
+  with UserNotFound -> login_page ()
 
+let rec start_page () =
+  print_blue "\nWelcome to Twitter.\n";
+  print_blue "\nCommands: create account, login\n";
+  try
+    match parse (read_line ()) with
+    | Create ->
+        let user = create_profile () in
+        get_command (User.id user)
+    | Login -> login_page ()
+    | _ ->
+        print_invalid ();
+        start_page ()
+  with Invalid | Empty | _ ->
+    print_invalid ();
+    start_page ()
+
+let main () = start_page ()
 let () = main ()

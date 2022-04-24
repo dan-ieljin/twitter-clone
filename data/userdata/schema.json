@@ -12,6 +12,9 @@
           "username": {
             "type": "string"
           },
+          "password": {
+            "type": "string"
+          },
           "bio": {
             "type": "string"
           },
@@ -28,6 +31,7 @@
         "required": [
           "name",
           "username",
+          "password",
           "bio",
           "id",
           "posts"

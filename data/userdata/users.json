@@ -1,18 +1,1 @@
-{
-  "users": [
-    {
-      "name": "John Doe",
-      "username": "@johndoe",
-      "bio": "hi",
-      "id": 0,
-      "posts": []
-    },
-    {
-      "name": "Purit",
-      "username": "@purit",
-      "bio": "Hi",
-      "id": 0,
-      "posts": []
-    }
-  ]
-}
+{"users":[{"name":"Harry Potter","username":"hp","password":"password","bio":"Hello","id":2,"posts":[]},{"name":"John Doe","username":"johndoe","password":"password","bio":"hi","id":1,"posts":[]},{"name":"David","username":"davidgries","password":"password","bio":"hello!","id":0,"posts":[3]}]}

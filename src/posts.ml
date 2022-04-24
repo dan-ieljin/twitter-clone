@@ -62,6 +62,33 @@ let from_json json : t =
   try json |> member "posts" |> to_list |> List.map parse_record
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
+(** [to_yojson p] converts a the data of a post [p] displayed in a
+    record into a Yojson type association list. *)
+let to_yojson p : Yojson.Basic.t =
+  `Assoc
+    [
+      ("tweet", `String p.text);
+      ("hashtags", `List (List.map (fun x -> `String x) p.hashtags));
+      ("timestamp", `String p.timestamp);
+      ("id", `Int p.id);
+      ("username", `String p.username);
+      ("likes", `Int p.likes);
+      ("retweets", `Int p.retweets);
+      ("is retweet", `Bool p.is_retweet);
+    ]
+
+(** File containing the JSON represenation of post list. *)
+let file = "data/posts.json"
+
+let to_json post_list =
+  let json_output (post_list : t) : Yojson.Basic.t =
+    `Assoc [ ("posts", `List (List.map to_yojson post_list)) ]
+  in
+  let yojson_post = json_output post_list in
+  let oc = open_out file in
+  Yojson.Basic.to_channel oc yojson_post;
+  close_out oc
+
 let hashtags s =
   let text_list =
     s |> String.lowercase_ascii |> String.split_on_char ' '
@@ -87,7 +114,7 @@ let last_id (post_list : t) =
   if List.length post_list = 0 then 0
   else (List.nth post_list (List.length post_list - 1)).id
 
-let add_post s user : t =
+let add_post s user =
   let length = s |> String.trim |> String.length in
   if length > 280 then raise (InvalidPost "Too long")
   else if length <= 0 then raise (InvalidPost "Too short");
@@ -95,18 +122,26 @@ let add_post s user : t =
   let post_list =
     Yojson.Basic.from_file "data/posts.json" |> from_json
   in
-  try post_list @ [ create_post s (last_id post_list + 1) user ]
+  try
+    let new_post = create_post s (last_id post_list + 1) user in
+    post_list @ [ new_post ] |> to_json;
+    User.assign_post new_post.id user
   with InvalidPost "hashtag" -> raise (InvalidPost "hashtag")
 
-let rec delete_post id posts : t =
+let delete_post id posts user =
   let decr_ids post_lst =
     match post_lst with
     | [] -> []
     | h :: t -> List.map (fun x -> { x with id = x.id - 1 }) (h :: t)
   in
-  match posts with
-  | [] -> raise PostNotFound
-  | h :: t -> if h.id = id then decr_ids t else h :: delete_post id t
+  let rec delete_helper id posts : t =
+    match posts with
+    | [] -> raise PostNotFound
+    | h :: t ->
+        if h.id = id then decr_ids t else h :: delete_helper id t
+  in
+  delete_helper id posts |> to_json;
+  User.remove_post id user
 
 (**[like_post_helper i p r] is a helper method for [like_post] that
    returns a post list [r] with the the updated like count of the post
@@ -156,33 +191,6 @@ let sort_newest (posts : t) : t =
 let sort_likes (posts : t) =
   List.sort (fun x y -> y.likes - x.likes) posts
 
-(** [to_yojson p] converts a the data of a post [p] displayed in a
-    record into a Yojson type association list. *)
-let to_yojson p : Yojson.Basic.t =
-  `Assoc
-    [
-      ("tweet", `String p.text);
-      ("hashtags", `List (List.map (fun x -> `String x) p.hashtags));
-      ("timestamp", `String p.timestamp);
-      ("id", `Int p.id);
-      ("username", `String p.username);
-      ("likes", `Int p.likes);
-      ("retweets", `Int p.retweets);
-      ("is retweet", `Bool p.is_retweet);
-    ]
-
-(** File containing the JSON represenation of post list. *)
-let file = "data/posts.json"
-
-let to_json post_list =
-  let json_output (post_list : t) : Yojson.Basic.t =
-    `Assoc [ ("posts", `List (List.map to_yojson post_list)) ]
-  in
-  let yojson_post = json_output post_list in
-  let oc = open_out file in
-  Yojson.Basic.to_channel oc yojson_post;
-  close_out oc
-
 let is_substr str sub =
   let reg = Str.regexp_string sub in
   try
@@ -197,8 +205,10 @@ let rec search_posts (key : string) (lst : t) : t =
       if is_substr post.text key then post :: search_posts key t
       else search_posts key t
 
-let get_posts (ids : int list) (lst : t) : t =
-  List.filter (fun post -> List.mem post.id ids) lst
+let get_posts (ids : int list) : t =
+  List.filter
+    (fun post -> List.mem post.id ids)
+    (from_json (Yojson.Basic.from_file "data/posts.json"))
 
 (**[get_id p] returns the id of post [p].*)
 let get_id p = p.id

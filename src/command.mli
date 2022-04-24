@@ -7,6 +7,8 @@ type command =
   | Like of int
   | Retweet of int
   | ViewProfile
+  | Create
+  | Login
   | Search of string
   | Sort
   | Quit

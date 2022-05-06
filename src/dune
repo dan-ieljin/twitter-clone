@@ -1,4 +1,6 @@
 (library
  (name twitter)
  (public_name Twitter)
- (libraries yojson unix ANSITerminal str))
+ (libraries yojson unix ANSITerminal str)
+ (instrumentation
+  (backend bisect_ppx)))

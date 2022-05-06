@@ -24,12 +24,14 @@ let username p = p.username
 let likes p = p.likes
 let retweets p = p.retweets
 
+(** [get_date tm] is the string representation of the date of tm. *)
 let get_date (tm : Unix.tm) =
   let month = string_of_int tm.tm_mon in
   let day = string_of_int tm.tm_mday in
   let year = string_of_int (1900 + tm.tm_year) in
   month ^ "/" ^ day ^ "/" ^ year
 
+(** [get_time tm] is the string representation of the time of tm. *)
 let get_time (tm : Unix.tm) =
   let hour =
     if tm.tm_hour = 0 then string_of_int 12
@@ -45,7 +47,7 @@ let get_time (tm : Unix.tm) =
 
 let date_and_time tm = get_time tm ^ " " ^ get_date tm
 
-(**[parse_record j] helps parse the post text, hashtags, and timestamp.*)
+(** [parse_record j] helps parse the post text, hashtags, and timestamp. *)
 let parse_record j =
   {
     text = j |> member "tweet" |> to_string;
@@ -96,6 +98,9 @@ let hashtags s =
   List.filter (fun x -> x.[0] = '#') text_list
 
 let create_post s id_val user_id =
+  let length = s |> String.trim |> String.length in
+  if length > 280 then raise (InvalidPost "Too long")
+  else if length <= 0 then raise (InvalidPost "Too short");
   let user = User.get_user user_id in
   {
     text = s;
@@ -115,10 +120,6 @@ let last_id (post_list : t) =
   else (List.nth post_list (List.length post_list - 1)).id
 
 let add_post s user =
-  let length = s |> String.trim |> String.length in
-  if length > 280 then raise (InvalidPost "Too long")
-  else if length <= 0 then raise (InvalidPost "Too short");
-
   let post_list =
     Yojson.Basic.from_file "data/posts.json" |> from_json
   in

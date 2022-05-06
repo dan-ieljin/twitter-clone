@@ -45,11 +45,10 @@ val hashtags : string -> string list
 (** [hashtags s] is the list of hashtags in string s *)
 
 val create_post : string -> int -> int -> post
-(** [create_post s lst] creates a record of type post with [s] as its
-    textual content, [lst] as its hashtags, and [id_val] as its id.
-    Raises: [InvalidPost p] if the length of [s] > 280 or [s] is the
-    empty string. Also raises [InvalidPost p] if [s] contains only white
-    space. *)
+(** [create_post s id user] creates a record of type post with [s] as
+    its textual content, [id] as its id value, and [user] as the
+    author's id. Raises: [InvalidPost p] if the length of [s] > 280 or
+    [s] is the empty string.*)
 
 val from_json : Yojson.Basic.t -> t
 (** [from_json p] is the post that [p] represents. Requires: [p] is a
@@ -82,7 +81,10 @@ val sort_likes : t -> t
 (** [sort_likes p] sorts posts [p] from most to least likes. *)
 
 val search_posts : string -> t -> t
+(** [search_posts str p] is all the posts that contain str. *)
+
 val get_posts : int list -> t
+(** [get_posts ids] is the list of posts with ids [ids]. *)
 
 val retweet_post : int -> t -> t
 (** [retweet_post i p] adds a retweet to the post with the id [i] and

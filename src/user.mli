@@ -33,7 +33,12 @@ val username : user -> string
 (** [username u] is the username of u. *)
 
 val assign_post : int -> int -> unit
+(** [assign_post id u] adds id to the list of posts for the user with id
+    [u]. *)
+
 val remove_post : int -> int -> unit
+(** [remove_post id u] removes id from the list of posts for the user
+    with id [u]. *)
 
 val to_json : t -> unit
 (** [to_json t] writes t to a JSON file. *)

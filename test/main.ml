@@ -1,6 +1,7 @@
 open OUnit2
 open Twitter
 open Posts
+open User
 
 (** [pp_string s] pretty-prints string [s]. *)
 let pp_string s = "\"" ^ s ^ "\""
@@ -20,6 +21,8 @@ let pp_list pp_elt lst =
   in
   "[" ^ pp_elts lst ^ "]"
 
+(* Posts helper functions *)
+
 let date_and_time_test
     (name : string)
     (tm : Unix.tm)
@@ -27,22 +30,41 @@ let date_and_time_test
   name >:: fun _ ->
   assert_equal ~printer:pp_string expected_output (date_and_time tm)
 
-let hashtags_test
-    (name : string)
-    (text : string)
-    (expected_output : string list) : test =
-  name >:: fun _ ->
-  assert_equal ~printer:(pp_list pp_string) expected_output
-    (hashtags text)
-
-let create_post_test
+let text_test
     (name : string)
     (post : string)
     (id : int)
     (user : int)
-    (expected_output : post) : test =
+    (expected_output : string) : test =
   name >:: fun _ ->
-  assert_equal expected_output (create_post post id user)
+  assert_equal expected_output (create_post post id user |> text)
+
+let text_exception_test
+    (name : string)
+    (post : string)
+    (id : int)
+    (user : int)
+    (expected_output : exn) : test =
+  name >:: fun _ ->
+  assert_raises expected_output (fun () ->
+      create_post post id user |> text)
+
+let hashtags_test
+    (name : string)
+    (post : string)
+    (expected_output : string list) : test =
+  name >:: fun _ ->
+  assert_equal ~printer:(pp_list pp_string) expected_output
+    (hashtags post)
+
+let id_test
+    (name : string)
+    (post : string)
+    (id : int)
+    (user : int)
+    (expected_output : int) : test =
+  name >:: fun _ ->
+  assert_equal expected_output (create_post post id user |> Posts.id)
 
 let tm_1 : Unix.tm =
   {
@@ -70,20 +92,72 @@ let tm_2 : Unix.tm =
     tm_isdst = false;
   }
 
+(* User helper functions *)
+let user_john = create_user "John Doe" "johndoe" "password" "bio"
+
+let username_test
+    (name : string)
+    (user : user)
+    (expected_value : string) : test =
+  name >:: fun _ -> assert_equal expected_value (username user)
+
+let post_id_test
+    (name : string)
+    (user : user)
+    (expected_value : int list) : test =
+  name >:: fun _ -> assert_equal expected_value (post_ids user)
+
+let auth_user_test
+    (name : string)
+    (user_name : string)
+    (pass : string)
+    (expected_value : int) : test =
+  name >:: fun _ ->
+  assert_equal expected_value (auth_user user_name pass |> id)
+
+let auth_user_exception_test
+    (name : string)
+    (user_name : string)
+    (pass : string)
+    (expected_value : exn) : test =
+  name >:: fun _ ->
+  assert_raises expected_value (fun () ->
+      auth_user user_name pass |> id)
+
 let posts_tests =
   [
     date_and_time_test "Date and time 1" tm_1 "11:11 AM 11/11/2011";
     date_and_time_test "Date and time 2" tm_2 "1:01 PM 1/1/2011";
-    (* create_post_test "Test 1" "test post #hi" 0 { text = "test post
-       #hi"; hashtags = [ "#hi" ]; timestamp = date_and_time
-       (Unix.localtime (Unix.time ())); id = 0; username = "blank";
-       }; *)
-    hashtags_test "One hashtag: #twitter" "Hello world #twitter"
+    text_test "Hello world test" "Hello world #twitter" 0 0
+      "Hello world #twitter";
+    text_exception_test "Empty post" "" 0 0 (InvalidPost "Too short");
+    text_exception_test "Long post"
+      "fsdfjlsdfjsldkfjs lksdjflkdsjfdsl lsdkfj lksdfj lsdflkjs \
+       dkfjsld dkj sdjflskdfjdslkfjlsdjflksdjfdsjfldksfjlksdjfl \
+       fldksjfkldsjfkldsjfklfjsdlfjk lskdjf klsd lkdsj fkldsjf klsd \
+       fjs dslfjksd jkj sdlkj fksd fklsd jkfls jdsjfklsdjfllds \
+       jflkdsjfklsdjfkldsjfkljdskfj dsklfjsdlkfjlklskdfjddkdlk \
+       dsjflkdsjflksdjflksdjfklsdjfkl fldksjflkdsfjldksjlsdkjflsk"
+      0 0 (InvalidPost "Too long");
+    hashtags_test "Back hashtag: #twitter" "Hello world #twitter"
       [ "#twitter" ];
-    hashtags_test "One hashtag: #hello" "hi #hello" [ "#hello" ];
+    hashtags_test "Front hashtag: #hello" "#hello hi" [ "#hello" ];
     hashtags_test "Two hashtags" "#CS3110 Hello world #hashtag"
       [ "#cs3110"; "#hashtag" ];
+    id_test "Post with id 0 " "test" 0 0 0;
+    id_test "Post with id max " "test" Int.max_int 0 Int.max_int;
   ]
 
-let suite = "test suite for Twitter" >::: List.flatten [ posts_tests ]
+let user_tests =
+  [
+    username_test "John Doe username" user_john "johndoe";
+    post_id_test "John Doe posts" user_john [];
+    auth_user_test "David Gries" "davidgries" "password" 0;
+    auth_user_test "John Doe" "johndoe" "password" 1;
+    auth_user_exception_test "Unknown user" "jim" "skldjf" UserNotFound;
+  ]
+
+let suite =
+  "test suite for Twitter" >::: List.flatten [ posts_tests; user_tests ]
+
 let _ = run_test_tt_main suite

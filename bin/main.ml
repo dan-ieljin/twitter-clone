@@ -38,14 +38,6 @@ let pp_posts (lst : t) =
   in
   pp_elts lst
 
-(* let rec get_user step arr = match step with | 0 -> print_blue "Let's
-   make a profile for you. Each on a separate line, please \ enter your
-   full name, username, and biography. \n\ Example: \n\ Alex Smith\n\
-   smith22\n\ I like eating grapes.\n"; arr.(0) <- read_line ();
-   get_user 1 arr | 1 -> print_blue ""; arr.(1) <- read_line ();
-   get_user 2 arr | 2 -> print_blue ""; arr.(2) <- read_line ();
-   get_user 3 arr | _ -> arr *)
-
 let show_results f key lst = print_endline (pp_posts (f key lst))
 
 let rec post user =

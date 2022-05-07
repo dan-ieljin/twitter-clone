@@ -1,6 +1,16 @@
 {
   "users": [
     {
+      "name": "test",
+      "username": "test",
+      "password": "test",
+      "bio": "tes",
+      "id": 3,
+      "posts": [
+        4
+      ]
+    },
+    {
       "name": "Harry Potter",
       "username": "hp",
       "password": "password",

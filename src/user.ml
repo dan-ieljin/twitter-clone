@@ -36,11 +36,10 @@ let from_json yojson : t =
   with Type_error (s, _) -> failwith ("Parsing error: " ^ s)
 
 let file = "data/userdata/users.json"
-let users = Yojson.Basic.from_file file |> from_json
+let users () = Yojson.Basic.from_file file |> from_json
 
 let new_id (users : t) =
-  if List.length users = 0 then 0
-  else (List.nth users (List.length users - 1)).id + 1
+  if List.length users = 0 then 0 else List.length users
 
 let create_user
     (name : string)
@@ -52,19 +51,19 @@ let create_user
     password;
     username = user_name;
     bio;
-    id = new_id users;
+    id = new_id (users ());
     posts = [];
   }
 
 let auth_user uname pass =
   if
     List.mem (uname, pass)
-      (List.map (fun u -> (u.username, u.password)) users)
-  then List.find (fun u -> u.username = uname) users
+      (List.map (fun u -> (u.username, u.password)) (users ()))
+  then List.find (fun u -> u.username = uname) (users ())
   else raise UserNotFound
 
 let get_user id =
-  try List.find (fun u -> u.id = id) users
+  try List.find (fun u -> u.id = id) (users ())
   with _ -> raise UserNotFound
 
 let to_yojson u : Yojson.Basic.t =
@@ -99,7 +98,7 @@ let print_profile u =
   print u.username;
   print ("Bio: " ^ u.bio)
 
-let add_user u = u :: users |> to_json
+let add_user u = u :: users () |> to_json
 
 (* let delete_user id users = match users with | [] -> *)
 
@@ -108,7 +107,7 @@ let assign_post post_id user_id =
     (fun u ->
       if u.id = user_id then { u with posts = post_id :: u.posts }
       else u)
-    users
+    (users ())
   |> to_json
 
 let remove_post post_id user_id =
@@ -117,5 +116,5 @@ let remove_post post_id user_id =
       if u.id = user_id then
         { u with posts = List.filter (fun x -> x = post_id) u.posts }
       else u)
-    users
+    (users ())
   |> to_json

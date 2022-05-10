@@ -1,1 +1,46 @@
-{"posts":[{"tweet":"my name is harry #harry","hashtags":["#harry"],"timestamp":"7:43 PM 3/23/2022","id":1,"username":"hp","likes":0,"retweets":0,"is retweet":false},{"tweet":"hello world","hashtags":[],"timestamp":"8:20 PM 3/23/2022","id":2,"username":"davidgries","likes":0,"retweets":0,"is retweet":false},{"tweet":"hi","hashtags":[],"timestamp":"8:27 PM 3/23/2022","id":3,"username":"davidgries","likes":0,"retweets":0,"is retweet":false}]}
+{
+  "posts": [
+    {
+      "tweet": "my name is harry #harry",
+      "hashtags": [
+        "#harry"
+      ],
+      "timestamp": "7:43 PM 3/23/2022",
+      "id": 1,
+      "username": "hp",
+      "likes": 0,
+      "retweets": 0,
+      "is retweet": false
+    },
+    {
+      "tweet": "hello world",
+      "hashtags": [],
+      "timestamp": "8:20 PM 3/23/2022",
+      "id": 2,
+      "username": "davidgries",
+      "likes": 0,
+      "retweets": 0,
+      "is retweet": false
+    },
+    {
+      "tweet": "hi",
+      "hashtags": [],
+      "timestamp": "8:27 PM 3/23/2022",
+      "id": 3,
+      "username": "davidgries",
+      "likes": 0,
+      "retweets": 0,
+      "is retweet": false
+    },
+    {
+      "tweet": "test 2",
+      "hashtags": [],
+      "timestamp": "2:29 AM 4/7/2022",
+      "id": 4,
+      "username": "test",
+      "likes": 1,
+      "retweets": 0,
+      "is retweet": false
+    }
+  ]
+}

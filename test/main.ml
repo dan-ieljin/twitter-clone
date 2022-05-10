@@ -2,6 +2,7 @@ open OUnit2
 open Twitter
 open Posts
 open User
+open Command
 
 (** [pp_string s] pretty-prints string [s]. *)
 let pp_string s = "\"" ^ s ^ "\""
@@ -98,31 +99,69 @@ let user_john = create_user "John Doe" "johndoe" "password" "bio"
 let username_test
     (name : string)
     (user : user)
-    (expected_value : string) : test =
-  name >:: fun _ -> assert_equal expected_value (username user)
+    (expected_output : string) : test =
+  name >:: fun _ -> assert_equal expected_output (username user)
 
 let post_id_test
     (name : string)
     (user : user)
-    (expected_value : int list) : test =
-  name >:: fun _ -> assert_equal expected_value (post_ids user)
+    (expected_output : int list) : test =
+  name >:: fun _ -> assert_equal expected_output (post_ids user)
 
 let auth_user_test
     (name : string)
     (user_name : string)
     (pass : string)
-    (expected_value : int) : test =
+    (expected_output : int) : test =
   name >:: fun _ ->
-  assert_equal expected_value (auth_user user_name pass |> id)
+  assert_equal expected_output (auth_user user_name pass |> id)
 
 let auth_user_exception_test
     (name : string)
     (user_name : string)
     (pass : string)
-    (expected_value : exn) : test =
+    (expected_output : exn) : test =
   name >:: fun _ ->
-  assert_raises expected_value (fun () ->
+  assert_raises expected_output (fun () ->
       auth_user user_name pass |> id)
+
+let create_user_test
+    (test_name : string)
+    (name : string)
+    (user_name : string)
+    (password : string)
+    (bio : string)
+    (expected_output : string) : test =
+  test_name >:: fun _ ->
+  assert_equal expected_output
+    (create_user name user_name password bio |> username)
+
+(* Command helper functions *)
+
+let parse_test
+    (name : string)
+    (str : string)
+    (expected_output : command) : test =
+  name >:: fun _ -> assert_equal expected_output (parse str)
+
+let parse_exception_test
+    (name : string)
+    (str : string)
+    (expected_output : exn) : test =
+  name >:: fun _ -> assert_raises expected_output (fun () -> parse str)
+
+let parse_sort_test
+    (name : string)
+    (str : string)
+    (expected_output : sort_command) : test =
+  name >:: fun _ -> assert_equal expected_output (parse_sort str)
+
+let parse_sort_exception_test
+    (name : string)
+    (str : string)
+    (expected_output : exn) : test =
+  name >:: fun _ ->
+  assert_raises expected_output (fun () -> parse_sort str)
 
 let posts_tests =
   [
@@ -155,9 +194,45 @@ let user_tests =
     auth_user_test "David Gries" "davidgries" "password" 0;
     auth_user_test "John Doe" "johndoe" "password" 1;
     auth_user_exception_test "Unknown user" "jim" "skldjf" UserNotFound;
+    create_user_test "Create user" "Mr. Test" "username" "pw" "bio"
+      "username";
+  ]
+
+let command_tests =
+  [
+    parse_test "Post" "post" Post;
+    parse_test "Post whitespace" "     POST     " Post;
+    parse_test "Homepage" "homepage" HomePage;
+    parse_test "Profile" "myprofile" ViewProfile;
+    parse_test "Create account" "create account" Create;
+    parse_test "Create account whitespace"
+      "       create       account      " Create;
+    parse_test "Login" "LOGIN" Login;
+    parse_test "Search one word" "search hello" (Search "hello");
+    parse_test "Search two words" "search testing testing"
+      (Search "testing testing");
+    parse_test "Search nothing" "search   " (Search "");
+    parse_test "Delete" "delete 0" (Delete 0);
+    parse_exception_test "Delete invalid string" "delete hi" Invalid;
+    parse_exception_test "Delete invalid int" "delete 0 0" Invalid;
+    parse_test "Quit" " QUIT" Quit;
+    parse_test "Like" "like 1" (Like 1);
+    parse_exception_test "Like invalid" "like post" Invalid;
+    parse_test "Retweet" "retweet 1" (Retweet 1);
+    parse_exception_test "Retweet invalid" "retweet post" Invalid;
+    parse_test "Sort" "sort" Sort;
+    parse_exception_test "Empty" "" Empty;
+    parse_exception_test "Invalid input" "dskfjsdlkf" Invalid;
+    parse_sort_test "Newest all caps" "NEWEST" Newest;
+    parse_sort_test "Newest" "newest" Newest;
+    parse_sort_test "Oldest" "oldest" Oldest;
+    parse_sort_test "Likes" "likes" Likes;
+    parse_sort_exception_test "Invalid parse sort input" "lsdjfds"
+      Invalid;
   ]
 
 let suite =
-  "test suite for Twitter" >::: List.flatten [ posts_tests; user_tests ]
+  "test suite for Twitter"
+  >::: List.flatten [ posts_tests; user_tests; command_tests ]
 
 let _ = run_test_tt_main suite

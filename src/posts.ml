@@ -11,11 +11,18 @@ type post = {
   is_retweet : bool;
 }
 
+type date = {
+  year : int;
+  month : int;
+  day : int;
+}
+
 type t = post list
 
 exception InvalidPost of string
 exception PostNotFound
 exception IsARetweet
+exception InvalidTime
 
 let text p = p.text
 let date_time p = p.timestamp
@@ -266,3 +273,84 @@ let rec retweet_post_helper i post_lst post_lst_return id_last =
 let retweet_post i post_lst =
   if last_id post_lst < i || i < 1 then raise PostNotFound
   else List.rev (retweet_post_helper i post_lst [] (last_id post_lst))
+
+(**[split_on_slash st] splits a string of date [t] into a string list
+   based on '/'.*)
+let split_on_slash st = String.split_on_char '/' st
+
+(**[time_to_list t] converts a string of time [t] into a string list.*)
+let time_to_list (t : string) : string list = String.split_on_char ' ' t
+
+(** date_val t] puts the year, month, and day of a date [t] into time
+    record format based on the string list representation.*)
+let date_val t =
+  {
+    year = List.nth t 2 |> int_of_string;
+    month = List.nth t 0 |> int_of_string;
+    day = List.nth t 1 |> int_of_string;
+  }
+
+(**[parse_time t] converts a time [t] in string format to a time record.
+   Raises: [InvalidTime] if [t] is not a valid time.*)
+let parse_time t =
+  match time_to_list t with
+  | _ :: _ :: t2 ->
+      let x = List.fold_left ( ^ ) "" t2 in
+      split_on_slash x |> date_val
+  | _ -> raise InvalidTime
+
+(**[time_trend_elgible t] determines if a time [t] is elgible to be
+   trending.*)
+let time_trend_elgible (t : string) : bool =
+  let current =
+    date_and_time (Unix.localtime (Unix.time ())) |> parse_time
+  in
+  match parse_time t with
+  | { year = y; month = m; day = d } -> (
+      match current with
+      | { year = y'; month = m'; day = d' } ->
+          if y <> y' then false
+          else if m' <> m then false
+          else if Int.abs (d' - d) > 7 then false
+          else true)
+
+(**[sort_algorithm p] returns the integer value representing a post's
+   trending score based on the sort algorithm implemented. Requires: [p]
+   is a post in the post list.*)
+let sort_algorithm (p : post) : float =
+  match p with
+  | {
+   text = _;
+   hashtags = _;
+   timestamp = t;
+   id = _;
+   username = _;
+   likes = l;
+   retweets = rt;
+   is_retweet = is_rt;
+  } ->
+      if is_rt then 0.
+      else if time_trend_elgible t then
+        (float_of_int l *. 1.5) +. (float_of_int rt *. 5.)
+      else 0.
+
+(**[sort_trending p] sorts a list [(a1,s1);(a2,s2);(an,sn)] containing
+   posts and each post's respective trending score in tuple format by
+   score (highest to lowest). Requires: The scores contained in the list
+   accurately reflect a post's trending algorithm score. *)
+let sort_trending (pair_lst : (post * float) list) =
+  pair_lst
+  |> List.sort (fun x y -> int_of_float (snd x -. snd y))
+  |> List.map (fun x -> fst x)
+
+let rec trending
+    (post_lst : t)
+    (trending_min : float)
+    (acc : (post * float) list) =
+  match post_lst with
+  | [] -> sort_trending acc
+  | h :: t ->
+      let score = sort_algorithm h in
+      if score >= trending_min then
+        trending t trending_min ((h, score) :: acc)
+      else trending t trending_min acc

@@ -7,6 +7,13 @@
 type post
 (** The type of values representing posts. *)
 
+type date = {
+  year : int;
+  month : int;
+  day : int;
+}
+(**The type of values representing a date.*)
+
 type t = post list
 (** The abstract list of values representing a list of posts*)
 
@@ -91,3 +98,9 @@ val retweet_post : int -> t -> t
     returns the new updated post list [p] with the updated retweet count
     and the retweeted post. Requires: [i] is greater than 0 and smaller
     than the greatest post id.*)
+
+val trending : t -> float -> (post * float) list -> t
+(**[trending posts s acc] returns a post list containing all of the
+   trending posts. Whether a post is trending or not is determined by
+   [sort_algorithm p]. [s] represents the minimum trending score for a
+   post to be considered trending and [acc] is the starting list.*)

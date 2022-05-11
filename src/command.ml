@@ -10,6 +10,7 @@ type command =
   | Search of string
   | Sort
   | Quit
+  | Trending
 
 type sort_command =
   | Newest
@@ -57,6 +58,7 @@ let parse str =
       | _ -> raise Invalid
     end
   | [ "sort" ] -> Sort
+  | [ "trending" ] -> Trending
   | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid
 

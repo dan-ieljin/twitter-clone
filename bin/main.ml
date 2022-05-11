@@ -79,8 +79,8 @@ and get_command user =
   print_blue
     "\n\
      What would you like to do? \n\
-     Commands: post, homepage, sort, delete, like, retweet, quit, \
-     myprofile, search _.\n";
+     Commands: post, homepage, sort, trending, delete, like, retweet, \
+     quit, myprofile, search _.\n";
   try
     match parse (read_line ()) with
     | Post ->
@@ -88,6 +88,7 @@ and get_command user =
         print_endline "Note: Hashtags must be separated by a space.\n";
         post user
     | HomePage -> print_homepage (from_json posts)
+    | Trending -> trending (from_json posts) 5. [] |> print_homepage
     | Sort -> (
         print_blue "\nHow would you like to sort?";
         print_endline "\nCommands: Newest, Oldest, Likes\n";

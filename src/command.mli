@@ -12,7 +12,7 @@ type command =
   | Search of string
   | Sort
   | Quit
-  | Trending
+  | Trending of string
 
 type sort_command =
   | Newest

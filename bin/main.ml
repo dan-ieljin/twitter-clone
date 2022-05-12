@@ -12,6 +12,12 @@ let print_red s =
 let print_green s =
   ANSITerminal.print_string [ ANSITerminal.green ] (s ^ "\n")
 
+let print_purple s =
+  ANSITerminal.print_string [ ANSITerminal.magenta ] (s ^ "\n")
+
+let print_yellow s =
+  ANSITerminal.print_string [ ANSITerminal.yellow ] (s ^ "\n")
+
 let print_invalid () =
   print_red "\nInvalid command. Please enter a new command.\n"
 
@@ -37,6 +43,22 @@ let pp_posts (lst : t) =
     loop 0 "" lst
   in
   pp_elts lst
+
+(** [pp_hashtags pp_elt lst] pretty-prints list [lst], using [pp_elt] to
+    pretty-print each element of [lst]. *)
+let pp_hashtags lst =
+  let pp_elt x = x in
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (_ :: _ as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1 ^ ", ") t'
+    in
+    loop 0 "" lst
+  in
+  "[" ^ pp_elts lst ^ "]"
 
 let show_results f key lst = print_endline (pp_posts (f key lst))
 
@@ -71,10 +93,17 @@ and delete id posts user =
 
 and get_command user =
   let posts = Yojson.Basic.from_file "data/posts.json" in
-  let print_homepage t =
-    print_blue "\nMain Feed:\n";
-    print_endline (pp_posts t);
-    get_command user
+  let print_homepage s t =
+    match s with
+    | "main feed" ->
+        print_blue "\nMain Feed:\n";
+        print_endline (pp_posts t);
+        get_command user
+    | "trending" ->
+        print_purple "\nTrending:\n";
+        print_endline (pp_posts t);
+        get_command user
+    | _ -> failwith "Not a valid print feature"
   in
   print_blue
     "\n\
@@ -87,15 +116,36 @@ and get_command user =
         print_blue "\nEnter a post:\n";
         print_endline "Note: Hashtags must be separated by a space.\n";
         post user
-    | HomePage -> print_homepage (from_json posts)
-    | Trending -> trending (from_json posts) 5. [] |> print_homepage
+    | HomePage -> print_homepage "main feed" (from_json posts)
+    | Trending s -> begin
+        match s with
+        | "posts" ->
+            trending (from_json posts) 5. []
+            |> print_homepage "trending"
+        | "hashtags" ->
+            print_purple "\nTrending:\n";
+            get_trending_hashtags (from_json posts) 5 []
+            |> pp_hashtags |> print_yellow;
+            get_command user
+        | _ ->
+            print_red
+              "\n\
+               Not a valid trending command. Please enter a new command.\n";
+            get_command user
+      end
     | Sort -> (
         print_blue "\nHow would you like to sort?";
         print_endline "\nCommands: Newest, Oldest, Likes\n";
         match parse_sort (read_line ()) with
-        | Newest -> print_homepage (posts |> from_json |> sort_newest)
-        | Oldest -> print_homepage (posts |> from_json |> sort_oldest)
-        | Likes -> print_homepage (posts |> from_json |> sort_likes))
+        | Newest ->
+            print_homepage "main feed"
+              (posts |> from_json |> sort_newest)
+        | Oldest ->
+            print_homepage "main feed"
+              (posts |> from_json |> sort_oldest)
+        | Likes ->
+            print_homepage "main feed" (posts |> from_json |> sort_likes)
+        )
     | Delete id -> delete id posts user
     | Like i -> begin
         try

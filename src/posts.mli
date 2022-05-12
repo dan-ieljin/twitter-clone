@@ -7,11 +7,7 @@
 type post
 (** The type of values representing posts. *)
 
-type date = {
-  year : int;
-  month : int;
-  day : int;
-}
+type date
 (**The type of values representing a date.*)
 
 type t = post list
@@ -104,3 +100,8 @@ val trending : t -> float -> (post * float) list -> t
    trending posts. Whether a post is trending or not is determined by
    [sort_algorithm p]. [s] represents the minimum trending score for a
    post to be considered trending and [acc] is the starting list.*)
+
+val get_trending_hashtags : t -> int -> string list -> string list
+(**[get_trending_hashtags i p s] returns a string list containing the
+   the trending hashtags sorted. Whether a hashtag is trending or not is
+   determined by whether hashtag is tagged in more than [i] posts. *)

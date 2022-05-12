@@ -1,4 +1,5 @@
 open Yojson.Basic.Util
+open Map
 
 type post = {
   text : string;
@@ -340,7 +341,7 @@ let sort_algorithm (p : post) : float =
    accurately reflect a post's trending algorithm score. *)
 let sort_trending (pair_lst : (post * float) list) =
   pair_lst
-  |> List.sort (fun x y -> int_of_float (snd x -. snd y))
+  |> List.sort (fun x y -> int_of_float (snd y -. snd x))
   |> List.map (fun x -> fst x)
 
 let rec trending
@@ -354,3 +355,29 @@ let rec trending
       if score >= trending_min then
         trending t trending_min ((h, score) :: acc)
       else trending t trending_min acc
+
+let sort_hashtags (i : int) (hashlist : ('k * 'v) list) =
+  hashlist
+  |> List.filter (fun x -> if snd x >= i then true else false)
+  |> List.sort (fun x y -> snd y - snd x)
+  |> List.map (fun x -> fst x)
+
+let rec trending_hashtags
+    (map : ('k, 'v) AssocListMap.t)
+    (i : int)
+    (hash : string list) =
+  match hash with
+  | [] -> map |> AssocListMap.bindings |> sort_hashtags i
+  | h :: t -> (
+      match AssocListMap.find h map with
+      | None -> trending_hashtags (AssocListMap.insert h 1 map) i t
+      | Some v ->
+          trending_hashtags (AssocListMap.insert h (v + 1) map) i t)
+
+let rec get_trending_hashtags p i hash : string list =
+  match p with
+  | [] -> hash |> trending_hashtags AssocListMap.empty i
+  | h :: t ->
+      if time_trend_elgible h.timestamp then
+        get_trending_hashtags t i (h.hashtags @ hash)
+      else get_trending_hashtags t i hash

@@ -1,0 +1,14 @@
+{
+  "posts": [
+    {
+      "tweet": "a",
+      "hashtags": [],
+      "timestamp": "1:41 AM 2/31/2022",
+      "id": 1,
+      "username": "joshua",
+      "likes": 1,
+      "retweets": 0,
+      "is retweet": false
+    }
+  ]
+}

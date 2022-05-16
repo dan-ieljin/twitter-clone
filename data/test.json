@@ -1,13 +1,92 @@
 {
   "posts": [
     {
-      "tweet": "a",
-      "hashtags": [],
+      "tweet": "a #foryou",
+      "hashtags": [
+        "#foryou"
+      ],
       "timestamp": "1:41 AM 2/31/2022",
       "id": 1,
       "username": "joshua",
       "likes": 1,
       "retweets": 0,
+      "is retweet": false
+    },
+    {
+      "tweet": "too old #foryou",
+      "hashtags": [
+        "#foryou"
+      ],
+      "timestamp": "1:43 AM 2/31/2022",
+      "id": 3,
+      "username": "joshua",
+      "likes": 1,
+      "retweets": 2,
+      "is retweet": false
+    },
+    {
+      "tweet": "trending #foryou #ontop",
+      "hashtags": [
+        "#foryou",
+        "#ontop"
+      ],
+      "timestamp": "1:45 AM 4/16/2022",
+      "id": 2,
+      "username": "joshua",
+      "likes": 1,
+      "retweets": 2,
+      "is retweet": false
+    },
+    {
+      "tweet": "not trending #foryou #ontop",
+      "hashtags": [
+        "#foryou",
+        "#ontop"
+      ],
+      "timestamp": "1:56 AM 4/16/2022",
+      "id": 2,
+      "username": "joshua",
+      "likes": 1,
+      "retweets": 2,
+      "is retweet": false
+    },
+    {
+      "tweet": "lets goooo trending #foryou #ontop",
+      "hashtags": [
+        "#foryou",
+        "#ontop"
+      ],
+      "timestamp": "2:41 AM 4/16/2022",
+      "id": 2,
+      "username": "joshua",
+      "likes": 1,
+      "retweets": 2,
+      "is retweet": false
+    },
+    {
+      "tweet": "not trending #foryou #ontop",
+      "hashtags": [
+        "#foryou",
+        "#ontop"
+      ],
+      "timestamp": "2:10 PM 4/16/2022",
+      "id": 2,
+      "username": "joshua",
+      "likes": 1,
+      "retweets": 2,
+      "is retweet": false
+    },
+    {
+      "tweet": "lets goooo trending #foryou #ontop",
+      "hashtags": [
+        "#foryou",
+        "#ontop"
+      ],
+      "timestamp": "2:41 PM 4/16/2022",
+      "id": 2,
+      "username": "joshua",
+      "likes": 1,
+      "retweets": 2,
       "is retweet": false
     }
   ]

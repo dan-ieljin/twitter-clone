@@ -147,7 +147,10 @@ let delete_post id posts user =
     match posts with
     | [] -> raise PostNotFound
     | h :: t ->
-        if h.id = id then decr_ids t else h :: delete_helper id t
+        if h.id = id && h.is_retweet = false then decr_ids t
+        else if h.id = id && h.is_retweet = true then
+          raise (InvalidPost "Can't delete retweet")
+        else h :: delete_helper id t
   in
   delete_helper id posts |> to_json;
   User.remove_post id user

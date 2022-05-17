@@ -211,7 +211,8 @@ let rec search_posts (key : string) (lst : t) : t =
   match lst with
   | [] -> []
   | post :: t ->
-      if is_substr post.text key then post :: search_posts key t
+      if is_substr (String.lowercase_ascii post.text) key then
+        post :: search_posts key t
       else search_posts key t
 
 let get_posts (ids : int list) : t =
@@ -224,6 +225,29 @@ let get_id p = p.id
 
 (**[get_text p] returns the text of post [p].*)
 let get_text p = p.text
+
+let shuffle_text txt =
+  let txt_lst = String.split_on_char ' ' txt in
+  let nd = List.map (fun c -> (Random.bits (), c)) txt_lst in
+  let sond = List.sort compare nd in
+  let sh = List.map snd sond in
+  String.concat " " sh
+
+let shuffle_post id =
+  let res = get_posts [ id ] in
+  match res with
+  | [ x ] -> { x with text = shuffle_text (get_text x) }
+  | _ -> failwith "id fail"
+
+let rec get_random () =
+  let len =
+    List.length (from_json (Yojson.Basic.from_file "data/posts.json"))
+  in
+  let n = Random.int len in
+  let res = get_posts [ n ] in
+  match res with
+  | [ x ] -> x
+  | _ -> get_random ()
 
 let rec get_post_retweet i post_lst id_last =
   match post_lst with

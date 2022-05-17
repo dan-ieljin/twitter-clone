@@ -7,7 +7,7 @@ exception UserNotFound
 type user
 (** The abstract type of values representing a Twitter user. *)
 
-type t
+type t = user list
 (** The abstract type of of values representing users. *)
 
 val create_user : string -> string -> string -> string -> user
@@ -45,3 +45,18 @@ val to_json : t -> unit
 
 val print_profile : int -> unit
 (** [print_profile u] prints the profile for user u. *)
+
+val edit_profile : int -> string array -> unit
+val follow : int -> int -> unit
+val unfollow : int -> int -> unit
+val display_users : unit -> int
+val users : unit -> t
+val followers : user -> int list
+val following : user -> int list
+val messages : user -> string list
+val get_uname_from_id : int -> string
+val send_message : int -> int -> string -> unit
+val inbox : int -> string list
+val save_post : int -> int -> unit
+val unsave_post : int -> int -> unit
+val saved : int -> int list

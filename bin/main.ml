@@ -2,6 +2,7 @@ open Twitter
 open User
 open Posts
 open Command
+open Polls
 
 let print_blue s =
   ANSITerminal.print_string [ ANSITerminal.cyan ] (s ^ "\n")
@@ -21,7 +22,7 @@ let print_yellow s =
 let print_invalid () =
   print_red "\nInvalid command. Please enter a new command.\n"
 
-let pp_posts (lst : t) =
+let pp_posts (lst : Posts.t) =
   let pp_elt (post : post) =
     "\n@" ^ username post ^ "  Id: "
     ^ string_of_int (Posts.id post)
@@ -38,6 +39,60 @@ let pp_posts (lst : t) =
       | [ h ] -> acc ^ pp_elt h
       | h1 :: (_ :: _ as t') ->
           if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1) t'
+    in
+    loop 0 "" lst
+  in
+  pp_elts lst
+
+let pp_lst lst f =
+  let rec loop n acc = function
+    | [] -> acc
+    | [ h ] -> acc ^ f h ^ " "
+    | h1 :: (_ :: _ as t') ->
+        if n = 100 then acc ^ "..."
+        else loop (n + 1) (acc ^ f h1 ^ " ") t'
+  in
+  loop 0 "" lst
+
+let pp_users (lst : User.t) =
+  let pp_elt (user : user) =
+    "\n@" ^ User.username user ^ " Id: "
+    ^ string_of_int (User.id user)
+    ^ "\nFollowers: "
+    ^ pp_lst (followers user) get_uname_from_id
+    ^ "\nFollowing: "
+    ^ pp_lst (following user) get_uname_from_id
+    ^ "\n\n"
+  in
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (_ :: _ as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1) t'
+    in
+    loop 0 "" lst
+  in
+  pp_elts lst
+
+let pp_polls (lst : Polls.t) =
+  let pp_elt (poll : poll) =
+    "\nQuestion: " ^ question poll ^ " Id: "
+    ^ string_of_int (Polls.id poll)
+    ^ "\nOptions: "
+    ^ pp_lst (options poll) (fun x -> x)
+    ^ "\nResults: "
+    ^ pp_lst (results poll) string_of_int
+    ^ "\n\n"
+  in
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (_ :: _ as t') ->
+          if n = 100 then acc ^ "..."
           else loop (n + 1) (acc ^ pp_elt h1) t'
     in
     loop 0 "" lst
@@ -61,6 +116,97 @@ let pp_hashtags lst =
   "[" ^ pp_elts lst ^ "]"
 
 let show_results f key lst = print_endline (pp_posts (f key lst))
+
+let saved_display user_id =
+  let ids = User.saved user_id in
+  get_posts ids
+
+let temp _ = ()
+
+let get_new_prof () =
+  let first =
+    print_blue "New name: ";
+    read_line ()
+  in
+  let bio =
+    print_blue "New bio: ";
+    read_line ()
+  in
+  [| first; bio |]
+
+let get_message () =
+  let message =
+    print_blue "Message: ";
+    read_line ()
+  in
+  message
+
+let get_res options =
+  let res =
+    print_blue "Your response: ";
+    read_line ()
+  in
+  if List.mem res options then res
+  else (
+    print_red "Invalid option.";
+    failwith "invalid response")
+
+let rec get_options lst idx =
+  let option =
+    print_endline
+      ("Option" ^ string_of_int idx
+     ^ ": (press enter without text to finish)");
+    read_line ()
+  in
+  if option <> "" then
+    let updated = Array.append lst [| option |] in
+    get_options updated (idx + 1)
+  else Array.to_list lst
+
+type info = {
+  question : string;
+  options : string list;
+}
+
+let get_poll_info () =
+  let question =
+    print_blue "Question: ";
+    read_line ()
+  in
+  let options = get_options [||] 0 in
+  { question; options }
+
+let help_info =
+  "\n\
+   Command | Description\n\
+   ---------------------\n\
+   post | write and publish a tweet\n\
+   homepage | view the main feed\n\
+   myprofile | view your profile info\n\
+   editprof | edit your profile info\n\
+   random | show a random post\n\
+   viewusers | show all active users\n\
+   inbox | view your direct messages\n\
+   viewsaved | view your saved posts\n\
+   logout | logout\n\
+   poll | create a new poll\n\
+   showpolls | show all active polls\n\
+   search [query] | search posts for key word\n\
+   delete [id] | delete your post with [id]\n\
+   quit | close the app\n\
+   like [id] | like the post with [id]\n\
+   answerpoll [id] | answer the poll with [id]\n\
+   save [id] | save the post with [id]\n\
+   unsave [id] | unsave the post with [id]\n\
+   shuffle [id] | scramble the text of the post [id] for fun!\n\
+   message [user_id] | send a message\n\
+   retweet [id] | retweet post with [id]\n\
+   follow [user_id] | follow user\n\
+   unfollow [user_id] | unfollow user\n\
+   sort | sort the items\n\
+  \ trending posts | show trending posts\n\
+   trending hashtags | show trending hashtags  \n\
+  \  "
 
 let rec post user =
   let p = read_line () in
@@ -106,12 +252,12 @@ and get_command user =
     | _ -> failwith "Not a valid print feature"
   in
   print_blue
-    "\n\
-     What would you like to do? \n\
-     Commands: post, homepage, sort, trending, delete, like, retweet, \
-     quit, myprofile, search _.\n";
+    "\nWhat would you like to do? \nType 'help' to see the commands.\n";
   try
     match parse (read_line ()) with
+    | Help ->
+        print_yellow help_info;
+        get_command user
     | Post ->
         print_blue "\nEnter a post:\n";
         print_endline "Note: Hashtags must be separated by a space.\n";
@@ -164,6 +310,54 @@ and get_command user =
                command.\n";
             get_command user
       end
+    | Random ->
+        print_endline (pp_posts [ get_random () ]);
+        get_command user
+    | Shuffle i ->
+        print_endline (pp_posts [ shuffle_post i ]);
+        get_command user
+    | Follow other ->
+        follow user other;
+        print_yellow ("Followed user" ^ string_of_int other);
+        get_command user
+    | Unfollow other ->
+        unfollow user other;
+        print_yellow ("Unfollowed user" ^ string_of_int other);
+        get_command user
+    | ViewUsers ->
+        print_endline (pp_users (User.users ()));
+        get_command user
+    | Message id ->
+        send_message user id (get_message ());
+        print_blue "Message sent.";
+        get_command user
+    | Save id ->
+        save_post user id;
+        print_blue "Post saved.";
+        get_command user
+    | Unsave id ->
+        unsave_post user id;
+        print_blue "Post unsaved.";
+        get_command user
+    | ViewSaved ->
+        print_endline (pp_posts (saved_display user));
+        get_command user
+    | Inbox ->
+        print_endline
+          ("Inbox:\n" ^ pp_lst (inbox user) (fun x -> x) ^ "\n\n");
+        get_command user
+    | Poll ->
+        let poll_info = get_poll_info () in
+        add_poll poll_info.question poll_info.options user;
+        get_command user
+    | ShowPolls ->
+        print_endline (pp_polls (all_polls ()));
+        get_command user
+    | AnswerPoll id ->
+        let res = get_res (options (ops_id id)) in
+        answer_poll id res;
+        print_endline "Responded to poll.";
+        get_command user
     | Retweet i -> begin
         try
           posts |> from_json |> retweet_post i |> to_json;
@@ -187,11 +381,19 @@ and get_command user =
           (pp_posts (get_posts (User.post_ids (get_user user))));
         get_command user
     | Search key ->
-        show_results search_posts key (posts |> from_json);
+        show_results search_posts
+          (String.lowercase_ascii key)
+          (posts |> from_json);
+        get_command user
+    | EditProf ->
+        print_profile user;
+        let new_info = get_new_prof () in
+        edit_profile user new_info;
         get_command user
     | Quit ->
         print_blue "See you next time!\n";
         exit 0
+    | Logout -> get_command user
     | Create | Login ->
         print_invalid ();
         get_command user

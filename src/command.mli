@@ -13,6 +13,22 @@ type command =
   | Sort
   | Quit
   | Trending of string
+  | Random
+  | Shuffle of int
+  | EditProf
+  | Follow of int
+  | Unfollow of int
+  | ViewUsers
+  | Message of int
+  | Inbox
+  | Save of int
+  | ViewSaved
+  | Unsave of int
+  | Logout
+  | Poll
+  | ShowPolls
+  | AnswerPoll of int
+  | Help
 
 type sort_command =
   | Newest

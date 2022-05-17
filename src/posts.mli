@@ -105,3 +105,7 @@ val get_trending_hashtags : t -> int -> string list -> string list
 (**[get_trending_hashtags i p s] returns a string list containing the
    the trending hashtags sorted. Whether a hashtag is trending or not is
    determined by whether hashtag is tagged in more than [i] posts. *)
+
+val get_random : unit -> post
+val get_text : post -> string
+val shuffle_post : int -> post

@@ -34,7 +34,7 @@ let retweets p = p.retweets
 
 (** [get_date tm] is the string representation of the date of tm. *)
 let get_date (tm : Unix.tm) =
-  let month = string_of_int tm.tm_mon in
+  let month = string_of_int (tm.tm_mon + 1) in
   let day = string_of_int tm.tm_mday in
   let year = string_of_int (1900 + tm.tm_year) in
   month ^ "/" ^ day ^ "/" ^ year

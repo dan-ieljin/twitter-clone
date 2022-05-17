@@ -67,13 +67,24 @@ let id_test
   name >:: fun _ ->
   assert_equal expected_output (create_post post id user |> Posts.id)
 
+let trending_hashtags_test
+    (name : string)
+    (posts : Twitter.Posts.t)
+    (i : int)
+    (p : string list)
+    (expected_output : string list) : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (get_trending_hashtags posts i p)
+    ~printer:(pp_list pp_string)
+
 let tm_1 : Unix.tm =
   {
     tm_sec = 11;
     tm_min = 11;
     tm_hour = 11;
     tm_mday = 11;
-    tm_mon = 11;
+    tm_mon = 10;
     tm_year = 111;
     tm_wday = 1;
     tm_yday = 1;
@@ -86,7 +97,7 @@ let tm_2 : Unix.tm =
     tm_min = 1;
     tm_hour = 13;
     tm_mday = 1;
-    tm_mon = 1;
+    tm_mon = 0;
     tm_year = 111;
     tm_wday = 1;
     tm_yday = 1;
@@ -231,8 +242,16 @@ let command_tests =
       Invalid;
   ]
 
+let trending_tests =
+  [
+    (let posts = Yojson.Basic.from_file "data/test.json" in
+     trending_hashtags_test "One hashtag trending" (from_json posts) 5
+       [] [ "#foryou"; "#ontop" ]);
+  ]
+
 let suite =
   "test suite for Twitter"
-  >::: List.flatten [ posts_tests; user_tests; command_tests ]
+  >::: List.flatten
+         [ posts_tests; user_tests; command_tests; trending_tests ]
 
 let _ = run_test_tt_main suite

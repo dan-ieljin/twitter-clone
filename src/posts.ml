@@ -34,7 +34,7 @@ let retweets p = p.retweets
 
 (** [get_date tm] is the string representation of the date of tm. *)
 let get_date (tm : Unix.tm) =
-  let month = string_of_int tm.tm_mon in
+  let month = string_of_int (tm.tm_mon + 1) in
   let day = string_of_int tm.tm_mday in
   let year = string_of_int (1900 + tm.tm_year) in
   month ^ "/" ^ day ^ "/" ^ year
@@ -147,7 +147,10 @@ let delete_post id posts user =
     match posts with
     | [] -> raise PostNotFound
     | h :: t ->
-        if h.id = id then decr_ids t else h :: delete_helper id t
+        if h.id = id && h.is_retweet = false then decr_ids t
+        else if h.id = id && h.is_retweet = true then
+          raise (InvalidPost "Can't delete retweet")
+        else h :: delete_helper id t
   in
   delete_helper id posts |> to_json;
   User.remove_post id user
@@ -249,55 +252,6 @@ let rec get_random () =
   | [ x ] -> x
   | _ -> get_random ()
 
-let rec get_post_retweet i post_lst id_last =
-  match post_lst with
-  | [] -> raise PostNotFound
-  | h :: t ->
-      if get_id h = i then
-        {
-          h with
-          is_retweet = true;
-          text = "Retweet: " ^ get_text h;
-          id = id_last + 1;
-        }
-      else get_post_retweet i t id_last
-
-let rec retweet_post_helper i post_lst post_lst_return id_last =
-  match post_lst with
-  | [] -> get_post_retweet i post_lst_return id_last :: post_lst_return
-  | {
-      text = x;
-      hashtags = x2;
-      timestamp = x3;
-      id = idnum;
-      username = x4;
-      likes = l;
-      retweets = r;
-      is_retweet = x6;
-    }
-    :: t ->
-      let h =
-        {
-          text = x;
-          hashtags = x2;
-          timestamp = x3;
-          id = idnum;
-          username = x4;
-          likes = l;
-          retweets = r;
-          is_retweet = x6;
-        }
-      in
-      if idnum = i && x6 = false then
-        retweet_post_helper i t
-          ({ h with retweets = r + 1 } :: post_lst_return)
-          id_last
-      else if idnum = i && x6 = true then raise IsARetweet
-      else retweet_post_helper i t (h :: post_lst_return) id_last
-
-let retweet_post i post_lst =
-  if last_id post_lst < i || i < 1 then raise PostNotFound
-  else List.rev (retweet_post_helper i post_lst [] (last_id post_lst))
 
 (**[split_on_slash st] splits a string of date [t] into a string list
    based on '/'.*)
@@ -356,7 +310,7 @@ let sort_algorithm (p : post) : float =
   } ->
       if is_rt then 0.
       else if time_trend_elgible t then
-        (float_of_int l *. 1.5) +. (float_of_int rt *. 5.)
+        (float_of_int l *. 1.) +. (float_of_int rt *. 3.)
       else 0.
 
 (**[sort_trending p] sorts a list [(a1,s1);(a2,s2);(an,sn)] containing
@@ -405,3 +359,53 @@ let rec get_trending_hashtags p i hash : string list =
       if time_trend_elgible h.timestamp then
         get_trending_hashtags t i (h.hashtags @ hash)
       else get_trending_hashtags t i hash
+
+let rec get_post_retweet i post_lst id_last =
+  match post_lst with
+  | [] -> raise PostNotFound
+  | h :: t ->
+      if get_id h = i then
+        {
+          h with
+          is_retweet = true;
+          text = "Retweet: " ^ get_text h;
+          id = id_last + 1;
+        }
+      else get_post_retweet i t id_last
+
+let rec retweet_post_helper i post_lst post_lst_return id_last =
+  match post_lst with
+  | [] -> get_post_retweet i post_lst_return id_last :: post_lst_return
+  | {
+      text = x;
+      hashtags = x2;
+      timestamp = x3;
+      id = idnum;
+      username = x4;
+      likes = l;
+      retweets = r;
+      is_retweet = x6;
+    }
+    :: t ->
+      let h =
+        {
+          text = x;
+          hashtags = x2;
+          timestamp = x3;
+          id = idnum;
+          username = x4;
+          likes = l;
+          retweets = r;
+          is_retweet = x6;
+        }
+      in
+      if idnum = i && x6 = false then
+        retweet_post_helper i t
+          ({ h with retweets = r + 1 } :: post_lst_return)
+          id_last
+      else if idnum = i && x6 = true then raise IsARetweet
+      else retweet_post_helper i t (h :: post_lst_return) id_last
+
+let retweet_post i post_lst =
+  if last_id post_lst < i || i < 1 then raise PostNotFound
+  else List.rev (retweet_post_helper i post_lst [] (last_id post_lst))

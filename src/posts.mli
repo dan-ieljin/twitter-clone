@@ -64,7 +64,7 @@ val add_post : string -> int -> unit
 val delete_post : int -> t -> int -> unit
 (** [delete_post id] is the data structure representing posts with the
     post of [id] removed. Raises: [PostNotFound] if a post with id [id]
-    does not exist. *)
+    does not exist. [InvalidPost] if a post with id [id] is a retweet. *)
 
 val to_json : t -> unit
 (** [to_json p] converts posts [p] into JSON file.*)

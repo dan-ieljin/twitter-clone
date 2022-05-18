@@ -12,11 +12,7 @@ type poll = {
 type t = poll list
 
 let question p = p.question
-
-(* let date_time p = p.timestamp *)
 let id p = p.id
-
-(* let username p = p.username *)
 let options p = p.options
 let results p = p.results
 

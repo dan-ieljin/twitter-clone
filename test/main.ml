@@ -1,3 +1,28 @@
+(* Test Plan: To test the vailidity of our system, we employed a
+   combination of unit tests and manual testing. The code for the
+   command line UI, written in bin/main.ml, was tested manually by us to
+   ensure that the terminal outputted the correct information and that
+   the program behaved correctly with no error throws or abnormal
+   behavior. Since users will be interacting directly with the command
+   line and most functions simply return (), it is difficult to test
+   these with OUnit. However, the Posts, Users, and Command modules were
+   all tested with OUnit using glass box testing through Bisect. This
+   methodology allowed us to ensure maximal code coverage for our test
+   cases. Some functions wrote directly to json and returned (),
+   specifically several in the Posts and Users modules, which made it
+   difficult to write test cases for. In such cases, we examined the
+   data files to ensure that the behavior was what we anticipated. We
+   also wrote black box tests for edge cases for functions that dealt
+   with numbers such as date_and_time. We believe the combination of
+   black box, glass box, and extensive manual testing ensures the
+   correctness of our program as the bulk of the logic is tested through
+   unit tests and whatever functions we don't have test cases for have
+   been through constant testing by the three of us over the course of
+   the project to ensure correct behavior. The correctness of the
+   program is also readily apparent any user since all the posts that
+   are created show up on the main feed with all the data displayed
+   accordingly. *)
+
 open OUnit2
 open Twitter
 open Posts

@@ -1,8 +1,7 @@
 (** Representation of user data. Handles creating new users. *)
 
-exception InvalidName
-exception UName
 exception UserNotFound
+(** Raised when a user id does not exist. *)
 
 type user
 (** The abstract type of values representing a Twitter user. *)

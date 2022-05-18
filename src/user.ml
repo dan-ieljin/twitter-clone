@@ -1,7 +1,5 @@
 open Yojson.Basic.Util
 
-exception InvalidName
-exception UName
 exception UserNotFound
 
 type user = {

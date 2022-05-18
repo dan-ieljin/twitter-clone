@@ -204,8 +204,8 @@ let help_info =
    follow [user_id] | follow user\n\
    unfollow [user_id] | unfollow user\n\
    sort | sort the items\n\
-  \ trending posts | show trending posts\n\
-   trending hashtags | show trending hashtags  \n\
+  \ trending -> posts | show trending posts\n\
+   trending -> hashtags | show trending hashtags  \n\
   \  "
 
 let rec post user =
@@ -263,8 +263,11 @@ and get_command user =
         print_endline "Note: Hashtags must be separated by a space.\n";
         post user
     | HomePage -> print_homepage "main feed" (from_json posts)
-    | Trending s -> begin
-        match s with
+    | Trending _ -> begin
+        print_blue
+          "\n\
+           Would you like to view posts or hashtags (posts/hashtags)\n";
+        match read_line () with
         | "posts" ->
             trending (from_json posts) 5. []
             |> print_homepage "trending"

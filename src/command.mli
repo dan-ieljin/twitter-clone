@@ -1,6 +1,5 @@
-(** Parsing of user input into commands. *)
-
-(** Type of valid command constructors. *)
+(** The type [command] represents commands that users enter into the
+    program *)
 type command =
   | Post
   | HomePage
@@ -31,20 +30,21 @@ type command =
   | AnswerPoll of int
   | Help
 
-(** A type to specify how to sort the posts. *)
+(** The type [sort_command] represents the commands that users enter to
+    sort posts. *)
 type sort_command =
   | Newest
   | Oldest
   | Likes
 
 exception Empty
-(** [Empty] is when the user inputs an empty string. *)
+(** Raised when an empty command is parsed. *)
 
 exception Invalid
-(** [Invalid] is when the user inputs an invalid string. *)
+(** Raised when an invalid command is parsed. *)
 
 val parse : string -> command
 (** [parse s] is the command parsed from [s]. *)
 
 val parse_sort : string -> sort_command
-(** [parse_sort s] is the sort_command parsed from [s]. *)
+(** Converts user input for sorting posts into a command. *)

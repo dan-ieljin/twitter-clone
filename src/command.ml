@@ -1,3 +1,5 @@
+(** Representation of user commands. *)
+
 type command =
   | Post
   | HomePage

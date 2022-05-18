@@ -47,16 +47,46 @@ val print_profile : int -> unit
 (** [print_profile u] prints the profile for user u. *)
 
 val edit_profile : int -> string array -> unit
+(** [edit_profile id arr] modifies the name and bio of user with [id]. *)
+
 val follow : int -> int -> unit
+(** [follow cur other] adds user [other] to the followings of user
+    [cur], and user [cur] to the followers of user [other]. *)
+
 val unfollow : int -> int -> unit
-val display_users : unit -> int
+(** [unfollow cur other] removes user [other] from the followings of
+    user [cur], and user [cur] from the followers of user [other]. *)
+
 val users : unit -> t
+(** [users ()] is all the active users. *)
+
 val followers : user -> int list
+(** [followers user] is all the ids of [user]'s followers . *)
+
 val following : user -> int list
+(** [following user] is all the ids of [user]'s followings . *)
+
 val messages : user -> string list
+(** [messages user] is all the messages received by [user]. *)
+
 val get_uname_from_id : int -> string
+(** [get_uname_from_id id] is the username associated with user [id]. *)
+
 val send_message : int -> int -> string -> unit
+(** [send_message cur other mes] adds a message to the inbox of user
+    [other] with user [cur]'s username indicated. *)
+
 val inbox : int -> string list
+(** [messages id] is all the messages received by user with id [id]. *)
+
 val save_post : int -> int -> unit
+(** [save_post user_id post_id] adds [post_id] to the favorites of user
+    with id [user_id]. *)
+
 val unsave_post : int -> int -> unit
+(** [unsave_post user_id post_id] removes [post_id] from the favorites
+    of user with id [user_id]. *)
+
 val saved : int -> int list
+(** [saved user_id] is the favorite posts' ids of user with id
+    [user_id]. *)

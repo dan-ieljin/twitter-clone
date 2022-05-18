@@ -107,5 +107,11 @@ val get_trending_hashtags : t -> int -> string list -> string list
    determined by whether hashtag is tagged in more than [i] posts. *)
 
 val get_random : unit -> post
+(** [get_random] returns a randomly selected post from the json. *)
+
 val get_text : post -> string
+(** [get_text post] the text of a given [post] in a special format. *)
+
 val shuffle_post : int -> post
+(** [shuffle_post id] the post [id] with the words of the text
+    scrambled. *)

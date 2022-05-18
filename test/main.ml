@@ -219,6 +219,10 @@ let command_tests =
     parse_test "Create account whitespace"
       "       create       account      " Create;
     parse_test "Login" "LOGIN" Login;
+    parse_test "ViewSaved" "ViewSaved" ViewSaved;
+    parse_test "ShowPolls" "ShowPolls" ShowPolls;
+    parse_test "EditProf" "editprof" EditProf;
+    parse_test "Poll" "poll" Poll;
     parse_test "Search one word" "search hello" (Search "hello");
     parse_test "Search two words" "search testing testing"
       (Search "testing testing");
@@ -228,6 +232,9 @@ let command_tests =
     parse_exception_test "Delete invalid int" "delete 0 0" Invalid;
     parse_test "Quit" " QUIT" Quit;
     parse_test "Like" "like 1" (Like 1);
+    parse_test "Follow" "follow 1" (Follow 1);
+    parse_test "Message" "message 1" (Message 1);
+    parse_test "Unfollow" "unfollow 1" (Unfollow 1);
     parse_exception_test "Like invalid" "like post" Invalid;
     parse_test "Retweet" "retweet 1" (Retweet 1);
     parse_exception_test "Retweet invalid" "retweet post" Invalid;

@@ -188,9 +188,9 @@ let remove_post post_id user_id =
     (users ())
   |> to_json
 
-let follow cur other =
+let follow cur otheri =
   let current = get_user cur in
-  let other = get_user other in
+  let other = get_user otheri in
   let new_cur =
     { current with following = other.id :: current.following }
   in
@@ -200,7 +200,8 @@ let follow cur other =
   let rem =
     List.filter (fun x -> x.id <> cur && x.id <> other.id) base
   in
-  new_cur :: new_other :: rem |> to_json
+  if cur = otheri then failwith "Cannot follow self"
+  else new_cur :: new_other :: rem |> to_json
 
 let unfollow cur other_id =
   let current = get_user cur in
@@ -219,8 +220,5 @@ let unfollow cur other_id =
   let rem =
     List.filter (fun x -> x.id <> cur && x.id <> other_id) base
   in
-  new_cur :: new_other :: rem |> to_json
-
-let display_users () =
-  (* let base = users () in *)
-  0
+  if cur = other_id then failwith "Cannot unfollow self"
+  else new_cur :: new_other :: rem |> to_json

@@ -9,19 +9,10 @@ type poll = {
   results : int list;
 }
 
-(* type date = { year : int; month : int; day : int; } *)
-
 type t = poll list
 
-(* exception InvalidPost of string exception PostNotFound exception
-   IsARetweet exception InvalidTime *)
-
 let question p = p.question
-
-(* let date_time p = p.timestamp *)
 let id p = p.id
-
-(* let username p = p.username *)
 let options p = p.options
 let results p = p.results
 

@@ -124,8 +124,7 @@ let parse str =
       | _ -> raise Invalid
     end
   | [ "sort" ] -> Sort
-  | [ "trending"; "posts" ] -> Trending "posts"
-  | [ "trending"; "hashtags" ] -> Trending "hashtags"
+  | [ "trending" ] -> Trending ""
   | [] | [ "" ] | "" :: _ -> raise Empty
   | _ -> raise Invalid
 

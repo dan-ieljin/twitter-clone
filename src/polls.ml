@@ -107,18 +107,18 @@ let all_polls () = Yojson.Basic.from_file "data/polls.json" |> from_json
 
 let ops_id id =
   try List.find (fun u -> u.id = id) (all_polls ())
-  with _ -> failwith "not found"
+  with _ -> failwith "Not found"
 
-let rec func x lst c =
+let rec index_of_tr elt lst i =
   match lst with
-  | [] -> raise (Failure "Not Found")
-  | hd :: tl -> if hd = x then c else func x tl (c + 1)
+  | [] -> failwith "Elt not in list"
+  | h :: t -> if h = elt then i else index_of_tr elt t (i + 1)
 
-let find x lst = func x lst 0
+let index_of elt lst = index_of_tr elt lst 0
 
 let answer_poll id res =
   let poll = ops_id id in
-  let idx = find res poll.options in
+  let idx = index_of res poll.options in
   let arr = Array.of_list poll.results in
   arr.(idx) <- Array.get arr idx + 1;
   let results = Array.to_list arr in

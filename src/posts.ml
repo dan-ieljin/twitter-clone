@@ -231,10 +231,10 @@ let get_text p = p.text
 
 let shuffle_text txt =
   let txt_lst = String.split_on_char ' ' txt in
-  let nd = List.map (fun c -> (Random.bits (), c)) txt_lst in
-  let sond = List.sort compare nd in
-  let sh = List.map snd sond in
-  String.concat " " sh
+  let paired = List.map (fun n -> (Random.bits (), n)) txt_lst in
+  let ordered = List.sort compare paired in
+  let shuffled = List.map snd ordered in
+  String.concat " " shuffled
 
 let shuffle_post id =
   let res = get_posts [ id ] in

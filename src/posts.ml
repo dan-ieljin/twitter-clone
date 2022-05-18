@@ -252,7 +252,6 @@ let rec get_random () =
   | [ x ] -> x
   | _ -> get_random ()
 
-
 (**[split_on_slash st] splits a string of date [t] into a string list
    based on '/'.*)
 let split_on_slash st = String.split_on_char '/' st

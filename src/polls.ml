@@ -1,3 +1,5 @@
+(** Representation of polls. *)
+
 open Yojson.Basic.Util
 
 type poll = {

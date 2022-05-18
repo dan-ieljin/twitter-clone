@@ -1,5 +1,6 @@
 (**Map module taken from Cornell CS 3110.*)
 
+(** Module type [Map] is an abstract representation of maps. *)
 module type Map = sig
   type ('k, 'v) t
   (** [('k, 'v) t] is the type of maps that bind keys of type ['k] to
@@ -30,6 +31,7 @@ module type Map = sig
       as [m]. There are no duplicate keys in the list. *)
 end
 
+(** Association list representation of a map. *)
 module AssocListMap : Map = struct
   type ('k, 'v) t = ('k * 'v) list
   (** AF: [[(k1, v1); (k2, v2); ...; (kn, vn)]] is the map {k1:v1,
